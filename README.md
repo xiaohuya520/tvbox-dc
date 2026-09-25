@@ -4,7 +4,11 @@
 
 ## 直接导入链接
 
-**精选版（16 条，资源多大仓，推荐日常用）** ← 本次主用
+**自己的单仓 mybox.json（聚合所有好源的站点，导入即出全部站点，不用选仓库，加载最快）** ← 本次主推
+- `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox.json`
+- 国内镜像：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox.json`
+
+**精选多仓版（16 条，资源多大仓，推荐日常用）**
 - `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/dc.json`
 - 国内镜像：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dc.json`
 
@@ -67,9 +71,11 @@
 3. 精选 `dc.json` 维持 16 个：锚点 → 原精选存活 → **资源多大仓优先**补满；
 4. 候选池 `sources_pool.json` = 内置 93 条种子 + 5 条 GitHub 直链单仓 + 借鉴多仓(Lightconer 肥猫/讴歌/4K)
    + 6 个网页聚合页抓取，**只增不删**；
-5. 有变化才提交，导入链接不变。
+5. 有变化才提交，导入链接不变；
+6. 同时自动重建 `mybox.json` 自建单仓：把当次所有存活源的直连站点（type=3）合并去重，
+   锚点（王二小 + sun）强制纳入，导入即出全部站点、无需选仓库。
 
-即「删失效 + 补最新 + 保资源多」全自动。可到仓库 Actions 页手动 `Run workflow` 立即触发。
+即「删失效 + 补最新 + 保资源多 + 自建单仓自动聚合」全自动。可到仓库 Actions 页手动 `Run workflow` 立即触发。
 
 > 注意：`dc_fast.json` 为手动维护，不在自动刷新范围内（避免自动补入慢源）。
 
