@@ -37,5 +37,6 @@ jobs:
             echo "无变化，跳过提交"
           else
             git commit -m "auto: 刷新 TVBox 源 $(date +%Y-%m-%d)"
+            git pull --rebase --no-edit origin main || true
             git push
           fi
