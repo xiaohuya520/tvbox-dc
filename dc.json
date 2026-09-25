@@ -5,7 +5,7 @@
       "url": "https://9280.kstore.vip/newwex.json"
     },
     {
-      "name": "新潇洒sun",
+      "name": "sun源(举例)",
       "url": "https://9877.kstore.space/sun.json"
     },
     {
@@ -29,10 +29,6 @@
       "url": "https://qist.wyfc.qzz.io/xiaosa/api.json"
     },
     {
-      "name": "摸鱼儿",
-      "url": "https://6800.kstore.vip/fish.json"
-    },
-    {
       "name": "OK影视",
       "url": "https://raw.liucn.cc/box/m.json"
     },
@@ -41,16 +37,8 @@
       "url": "https://gitlab.com/noimank/tvbox/-/raw/main/tvbox1.json"
     },
     {
-      "name": "FongMi",
-      "url": "https://cdn.jsdelivr.net/gh/FongMi/CatVodSpider@main/json/config.json"
-    },
-    {
       "name": "ls660飞猫",
       "url": "https://www.ls660.com/TV/feimao.json"
-    },
-    {
-      "name": "宝盒VIP",
-      "url": "https://cdn.jsdelivr.net/gh/guot55/YGBH@main/vip2.json"
     },
     {
       "name": "PG",
@@ -63,6 +51,18 @@
     {
       "name": "大嗷呜",
       "url": "https://9763.kstore.vip/aowu.json"
+    },
+    {
+      "name": "小盒子4K",
+      "url": "http://xhztv.top/4k.json"
+    },
+    {
+      "name": "牛二",
+      "url": "https://9280.kstore.space/newwex.json"
+    },
+    {
+      "name": "宝盒VIP",
+      "url": "https://raw.githubusercontent.com/guot55/YGBH/main/vip2.json"
     }
   ],
   "urls": [
@@ -72,7 +72,7 @@
     },
     {
       "url": "https://9877.kstore.space/sun.json",
-      "name": "新潇洒sun"
+      "name": "sun源(举例)"
     },
     {
       "url": "https://cdn.jsdelivr.net/gh/Lightconer/tvbox-ysc-config@main/output/feimao.json",
@@ -95,10 +95,6 @@
       "name": "潇洒"
     },
     {
-      "url": "https://6800.kstore.vip/fish.json",
-      "name": "摸鱼儿"
-    },
-    {
       "url": "https://raw.liucn.cc/box/m.json",
       "name": "OK影视"
     },
@@ -107,16 +103,8 @@
       "name": "noimank"
     },
     {
-      "url": "https://cdn.jsdelivr.net/gh/FongMi/CatVodSpider@main/json/config.json",
-      "name": "FongMi"
-    },
-    {
       "url": "https://www.ls660.com/TV/feimao.json",
       "name": "ls660飞猫"
-    },
-    {
-      "url": "https://cdn.jsdelivr.net/gh/guot55/YGBH@main/vip2.json",
-      "name": "宝盒VIP"
     },
     {
       "url": "https://www.252035.xyz/p/jsm.json",
@@ -129,6 +117,18 @@
     {
       "url": "https://9763.kstore.vip/aowu.json",
       "name": "大嗷呜"
+    },
+    {
+      "url": "http://xhztv.top/4k.json",
+      "name": "小盒子4K"
+    },
+    {
+      "url": "https://9280.kstore.space/newwex.json",
+      "name": "牛二"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/guot55/YGBH/main/vip2.json",
+      "name": "宝盒VIP"
     }
   ]
 }
