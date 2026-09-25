@@ -463,5 +463,30 @@
     "name": "tv(FongMi)",
     "url": "https://www.252035.xyz/z/FongMi.json",
     "src": "seed"
+  },
+  "https://raw.githubusercontent.com/liu673cn/box/main/m.json": {
+    "name": "m",
+    "url": "https://raw.githubusercontent.com/liu673cn/box/main/m.json",
+    "src": "gh"
+  },
+  "https://raw.githubusercontent.com/FongMi/CatVodSpider/main/json/config.json": {
+    "name": "config",
+    "url": "https://raw.githubusercontent.com/FongMi/CatVodSpider/main/json/config.json",
+    "src": "gh"
+  },
+  "https://raw.githubusercontent.com/gaotianliuyun/gao/master/js.json": {
+    "name": "js",
+    "url": "https://raw.githubusercontent.com/gaotianliuyun/gao/master/js.json",
+    "src": "gh"
+  },
+  "https://raw.githubusercontent.com/Yoursmile7/TVBox/main/XC.json": {
+    "name": "XC",
+    "url": "https://raw.githubusercontent.com/Yoursmile7/TVBox/main/XC.json",
+    "src": "gh"
+  },
+  "https://raw.githubusercontent.com/xiaolong69/tv/main/1.json": {
+    "name": "1",
+    "url": "https://raw.githubusercontent.com/xiaolong69/tv/main/1.json",
+    "src": "gh"
   }
 }
