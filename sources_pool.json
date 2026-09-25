@@ -1,0 +1,467 @@
+{
+  "https://9877.kstore.space/sun.json": {
+    "name": "sun源(举例)",
+    "url": "https://9877.kstore.space/sun.json",
+    "src": "seed"
+  },
+  "https://xn--sdds-rp5imh.v.nxog.top/apitv.php?id=3": {
+    "name": "欧歌接口",
+    "url": "https://xn--sdds-rp5imh.v.nxog.top/apitv.php?id=3",
+    "src": "seed"
+  },
+  "http://xhztv.top/4k.json": {
+    "name": "小盒子4K",
+    "url": "http://xhztv.top/4k.json",
+    "src": "seed"
+  },
+  "https://9280.kstore.vip/newwex.json": {
+    "name": "王二小",
+    "url": "https://9280.kstore.vip/newwex.json",
+    "src": "seed"
+  },
+  "https://jihulab.com/ymz1231/xymz/-/raw/main/ymshaoer": {
+    "name": "少儿频道",
+    "url": "https://jihulab.com/ymz1231/xymz/-/raw/main/ymshaoer",
+    "src": "seed"
+  },
+  "https://700sjro44343.vicp.fun/eggp/0211/tv.json": {
+    "name": "二月红接口",
+    "url": "https://700sjro44343.vicp.fun/eggp/0211/tv.json",
+    "src": "seed"
+  },
+  "http://影视仓.com/": {
+    "name": "影视仓",
+    "url": "http://影视仓.com/",
+    "src": "seed"
+  },
+  "http://home.jundie.top:81/top98.json": {
+    "name": "俊哥接口",
+    "url": "http://home.jundie.top:81/top98.json",
+    "src": "seed"
+  },
+  "https://tv.nxog.top/m/111.php?ou=公众号欧歌app&mz=index&jar=index&123&b=tv": {
+    "name": "欧歌免费",
+    "url": "https://tv.nxog.top/m/111.php?ou=公众号欧歌app&mz=index&jar=index&123&b=tv",
+    "src": "seed"
+  },
+  "http://tvbox.xn--4kq62z5rby2qupq9ub.top/": {
+    "name": "王二小接口",
+    "url": "http://tvbox.xn--4kq62z5rby2qupq9ub.top/",
+    "src": "seed"
+  },
+  "http://tv.999888987.xyz": {
+    "name": "王二小放牛娃",
+    "url": "http://tv.999888987.xyz",
+    "src": "seed"
+  },
+  "https://qist.wyfc.qzz.io/fty.json": {
+    "name": "饭太硬",
+    "url": "https://qist.wyfc.qzz.io/fty.json",
+    "src": "seed"
+  },
+  "http://宝盒接口.top": {
+    "name": "宝盒接口",
+    "url": "http://宝盒接口.top",
+    "src": "seed"
+  },
+  "https://qist.wyfc.qzz.io/xiaosa/api.json": {
+    "name": "潇洒",
+    "url": "https://qist.wyfc.qzz.io/xiaosa/api.json",
+    "src": "seed"
+  },
+  "https://9280.kstore.space/newwex.json": {
+    "name": "牛二",
+    "url": "https://9280.kstore.space/newwex.json",
+    "src": "seed"
+  },
+  "http://xn--5mqx81b535a.com/": {
+    "name": "uuccc",
+    "url": "http://xn--5mqx81b535a.com/",
+    "src": "seed"
+  },
+  "http://fmys.top/fmys.json": {
+    "name": "fmys",
+    "url": "http://fmys.top/fmys.json",
+    "src": "seed"
+  },
+  "https://13537.kstore.vip/tvbox/test.json": {
+    "name": "苍蓝",
+    "url": "https://13537.kstore.vip/tvbox/test.json",
+    "src": "seed"
+  },
+  "http://fty.888484.xyz/tv": {
+    "name": "饭太硬",
+    "url": "http://fty.888484.xyz/tv",
+    "src": "seed"
+  },
+  "https://www.iyouhun.com/tv/wex": {
+    "name": "新接口",
+    "url": "https://www.iyouhun.com/tv/wex",
+    "src": "seed"
+  },
+  "https://raw.liucn.cc/box/m.json": {
+    "name": "ok",
+    "url": "https://raw.liucn.cc/box/m.json",
+    "src": "seed"
+  },
+  "https://tv.203511.xyz/0821.json": {
+    "name": "荐片",
+    "url": "https://tv.203511.xyz/0821.json",
+    "src": "seed"
+  },
+  "http://124.223.214.31:8/api.json": {
+    "name": "my interface",
+    "url": "http://124.223.214.31:8/api.json",
+    "src": "seed"
+  },
+  "https://700sjro44343.vicp.fun/vip/vip/tv.json": {
+    "name": "1",
+    "url": "https://700sjro44343.vicp.fun/vip/vip/tv.json",
+    "src": "seed"
+  },
+  "http://tv.nxog.top/m/": {
+    "name": "cs",
+    "url": "http://tv.nxog.top/m/",
+    "src": "seed"
+  },
+  "http://47.96.82.41:5188/api.json": {
+    "name": "[软件]",
+    "url": "http://47.96.82.41:5188/api.json",
+    "src": "seed"
+  },
+  "https://gist.githubusercontent.com/ph7368/20ee6c7b64d77d82f8f4162cdd04ad61/raw/gistfile1.txt": {
+    "name": "ok(gist)",
+    "url": "https://gist.githubusercontent.com/ph7368/20ee6c7b64d77d82f8f4162cdd04ad61/raw/gistfile1.txt",
+    "src": "seed"
+  },
+  "https://cdn.jsdelivr.net/gh/liu673cn/box@main/m.json": {
+    "name": "11",
+    "url": "https://cdn.jsdelivr.net/gh/liu673cn/box@main/m.json",
+    "src": "seed"
+  },
+  "http://xn--6orr3pi6g9uu.top/": {
+    "name": "xn--6orr3pi6g9uu",
+    "url": "http://xn--6orr3pi6g9uu.top/",
+    "src": "seed"
+  },
+  "https://6800.kstore.vip/fish.json": {
+    "name": "摸鱼儿",
+    "url": "https://6800.kstore.vip/fish.json",
+    "src": "seed"
+  },
+  "https://700sjro44343.vicp.fun/eggp/0615/tv.php": {
+    "name": "700sjro44343(0615)",
+    "url": "https://700sjro44343.vicp.fun/eggp/0615/tv.php",
+    "src": "seed"
+  },
+  "http://www.xn--sss604efuw.net/tv": {
+    "name": "sss604efuw",
+    "url": "http://www.xn--sss604efuw.net/tv",
+    "src": "seed"
+  },
+  "https://9280.kstore.space/wex.json": {
+    "name": "牛儿",
+    "url": "https://9280.kstore.space/wex.json",
+    "src": "seed"
+  },
+  "http://550.3vcn.work/wdjyys.json": {
+    "name": "金鹰",
+    "url": "http://550.3vcn.work/wdjyys.json",
+    "src": "seed"
+  },
+  "https://raw.gitcode.com/jvftibcs-jbduyh/021/raw/main/18.json": {
+    "name": "66",
+    "url": "https://raw.gitcode.com/jvftibcs-jbduyh/021/raw/main/18.json",
+    "src": "seed"
+  },
+  "https://gitee.com/fuleishu/fulei/raw/master/fuleixyx.json": {
+    "name": "2",
+    "url": "https://gitee.com/fuleishu/fulei/raw/master/fuleixyx.json",
+    "src": "seed"
+  },
+  "https://9280.kstore.vip/aiwex.json": {
+    "name": "1",
+    "url": "https://9280.kstore.vip/aiwex.json",
+    "src": "seed"
+  },
+  "https://www.mayi520.org/": {
+    "name": "蚂蚁",
+    "url": "https://www.mayi520.org/",
+    "src": "seed"
+  },
+  "https://raw.giteeusercontent.com/junge8888/little-second-brother-999/raw/master/aiwex.json": {
+    "name": "GG影视",
+    "url": "https://raw.giteeusercontent.com/junge8888/little-second-brother-999/raw/master/aiwex.json",
+    "src": "seed"
+  },
+  "http://fty.333232.xyz/tv": {
+    "name": "饭太硬",
+    "url": "http://fty.333232.xyz/tv",
+    "src": "seed"
+  },
+  "http://124.223.214.31:16/8888": {
+    "name": "影视仓(8.8)",
+    "url": "http://124.223.214.31:16/8888",
+    "src": "seed"
+  },
+  "https://gh-proxy.org/https://raw.github.com/tly824/TM-TY/main/8.10.json": {
+    "name": "5",
+    "url": "https://gh-proxy.org/https://raw.github.com/tly824/TM-TY/main/8.10.json",
+    "src": "seed"
+  },
+  "https://ghfast.top/raw.githubusercontent.com/yigedashu/xwck/refs/heads/main/shiba1.txt": {
+    "name": "11(shiba)",
+    "url": "https://ghfast.top/raw.githubusercontent.com/yigedashu/xwck/refs/heads/main/shiba1.txt",
+    "src": "seed"
+  },
+  "https://raw.githubusercontent.com/xyq254245/xyqonlinerule/main/XYQTVBox.json": {
+    "name": "香雅情",
+    "url": "https://raw.githubusercontent.com/xyq254245/xyqonlinerule/main/XYQTVBox.json",
+    "src": "seed"
+  },
+  "https://tv.nxog.top/apitv.php?id=2": {
+    "name": "tvbox",
+    "url": "https://tv.nxog.top/apitv.php?id=2",
+    "src": "seed"
+  },
+  "https://xn--dkw0c.e.nxog.top/apitv.php?id=20": {
+    "name": "我的欧歌",
+    "url": "https://xn--dkw0c.e.nxog.top/apitv.php?id=20",
+    "src": "seed"
+  },
+  "https://dxawi.github.io/0/0.json": {
+    "name": "我",
+    "url": "https://dxawi.github.io/0/0.json",
+    "src": "seed"
+  },
+  "https://qist.wyfc.qzz.io/jsm.json": {
+    "name": "vv",
+    "url": "https://qist.wyfc.qzz.io/jsm.json",
+    "src": "seed"
+  },
+  "https://yqx.imgos.cn/yqx/tv/yqx2.json": {
+    "name": "御制(无采集)加速",
+    "url": "https://yqx.imgos.cn/yqx/tv/yqx2.json",
+    "src": "seed"
+  },
+  "https://pz.v88.qzz.io?format=2&source=full": {
+    "name": "01",
+    "url": "https://pz.v88.qzz.io?format=2&source=full",
+    "src": "seed"
+  },
+  "https://d.kstore.dev/download/14782/%E5%BD%B1%E8%A7%86%E4%BB%93.json": {
+    "name": "00000",
+    "url": "https://d.kstore.dev/download/14782/%E5%BD%B1%E8%A7%86%E4%BB%93.json",
+    "src": "seed"
+  },
+  "https://raw.githubusercontent.com/supermeguo/BoxRes/main/Myuse/catcr.json": {
+    "name": "apple",
+    "url": "https://raw.githubusercontent.com/supermeguo/BoxRes/main/Myuse/catcr.json",
+    "src": "seed"
+  },
+  "https://xn--flwh.v.nxog.top/m": {
+    "name": "歐哥",
+    "url": "https://xn--flwh.v.nxog.top/m",
+    "src": "seed"
+  },
+  "https://a.nxog.top?mm=328&ou=%E8%A3%85%F0%9F%85%B1": {
+    "name": "哦",
+    "url": "https://a.nxog.top?mm=328&ou=%E8%A3%85%F0%9F%85%B1",
+    "src": "seed"
+  },
+  "https://tv.nxog.top/m": {
+    "name": "欧哥",
+    "url": "https://tv.nxog.top/m",
+    "src": "seed"
+  },
+  "https://raw.githubusercontent.com/guot55/YGBH/main/vip2.json": {
+    "name": "宝盒VIP",
+    "url": "https://raw.githubusercontent.com/guot55/YGBH/main/vip2.json",
+    "src": "seed"
+  },
+  "https://gh-proxy.org/https://raw.githubusercontent.com/n3rddd/N3RD/master/JN/lemj.json": {
+    "name": "高级的很",
+    "url": "https://gh-proxy.org/https://raw.githubusercontent.com/n3rddd/N3RD/master/JN/lemj.json",
+    "src": "seed"
+  },
+  "https://raw.githubusercontent.com/wwb521/live/refs/heads/main/video.json": {
+    "name": "111",
+    "url": "https://raw.githubusercontent.com/wwb521/live/refs/heads/main/video.json",
+    "src": "seed"
+  },
+  "http://tv.nxog.top/": {
+    "name": "謳歌",
+    "url": "http://tv.nxog.top/",
+    "src": "seed"
+  },
+  "https://www.ls660.com/TV/feimao.json": {
+    "name": "ls660飞猫",
+    "url": "https://www.ls660.com/TV/feimao.json",
+    "src": "seed"
+  },
+  "https://xn--biib-rp5imh.v.nxog.top/apitv.php": {
+    "name": "青苹果",
+    "url": "https://xn--biib-rp5imh.v.nxog.top/apitv.php",
+    "src": "seed"
+  },
+  "http://a.nxog.top/m/111.php?ou=%E5%85%AC%E4%BC%97%E5%8F%B7%E6%AC%A7%E6%AD%8Capp&mz=index&jar=index&123&b=tv": {
+    "name": "11",
+    "url": "http://a.nxog.top/m/111.php?ou=%E5%85%AC%E4%BC%97%E5%8F%B7%E6%AC%A7%E6%AD%8Capp&mz=index&jar=index&123&b=tv",
+    "src": "seed"
+  },
+  "https://jszyapi.com/api.php/provide/vod/at/json": {
+    "name": "极速",
+    "url": "https://jszyapi.com/api.php/provide/vod/at/json",
+    "src": "seed"
+  },
+  "https://bitbucket.org/xduo/duoapi/raw/master/xpg.json": {
+    "name": "bitbucket-duoapi",
+    "url": "https://bitbucket.org/xduo/duoapi/raw/master/xpg.json",
+    "src": "seed"
+  },
+  "https://api.starlink.fan/api/FwaII1.json": {
+    "name": "zwz",
+    "url": "https://api.starlink.fan/api/FwaII1.json",
+    "src": "seed"
+  },
+  "https://raw.githubusercontent.com/PickPunk/TVbox-ZYplayer/refs/heads/main/ZY.json": {
+    "name": "zy",
+    "url": "https://raw.githubusercontent.com/PickPunk/TVbox-ZYplayer/refs/heads/main/ZY.json",
+    "src": "seed"
+  },
+  "https://www.252035.xyz/p/jsm.json": {
+    "name": "PG",
+    "url": "https://www.252035.xyz/p/jsm.json",
+    "src": "seed"
+  },
+  "https://jihulab.com/fyouhai/tvbox/-/raw/main/%E8%87%AA%E5%B7%B1%E4%BF%AE%E6%94%B9.json": {
+    "name": "自己修改",
+    "url": "https://jihulab.com/fyouhai/tvbox/-/raw/main/%E8%87%AA%E5%B7%B1%E4%BF%AE%E6%94%B9.json",
+    "src": "seed"
+  },
+  "https://jinenge.us.kg/app/tvbox/tvbox.json": {
+    "name": "tvbox放飞",
+    "url": "https://jinenge.us.kg/app/tvbox/tvbox.json",
+    "src": "seed"
+  },
+  "https://gh-proxy.org/https://raw.githubusercontent.com/ggrrttyyiii/CatVodSpider/refs/heads/main/json/demo.json": {
+    "name": "我的(CatVodSpider)",
+    "url": "https://gh-proxy.org/https://raw.githubusercontent.com/ggrrttyyiii/CatVodSpider/refs/heads/main/json/demo.json",
+    "src": "seed"
+  },
+  "https://tv.nxog.top/m/111.php": {
+    "name": "装歌",
+    "url": "https://tv.nxog.top/m/111.php",
+    "src": "seed"
+  },
+  "https://gh-proxy.org/raw.githubusercontent.com/bin1site1/bin1site1.github.io/refs/heads/main/OS.json": {
+    "name": "我的(OS)",
+    "url": "https://gh-proxy.org/raw.githubusercontent.com/bin1site1/bin1site1.github.io/refs/heads/main/OS.json",
+    "src": "seed"
+  },
+  "https://xn--7gq455ajscss5d.v.nxog.top/apia?id=1": {
+    "name": "新",
+    "url": "https://xn--7gq455ajscss5d.v.nxog.top/apia?id=1",
+    "src": "seed"
+  },
+  "https://xn--ihqu10cn4c.xn--v4q818bf34b.cc": {
+    "name": "摸鱼主用二",
+    "url": "https://xn--ihqu10cn4c.xn--v4q818bf34b.cc",
+    "src": "seed"
+  },
+  "https://cnb.cool/srka/aow/-/git/raw/main/config": {
+    "name": "|号线路",
+    "url": "https://cnb.cool/srka/aow/-/git/raw/main/config",
+    "src": "seed"
+  },
+  "https://pastebin.com/raw/gtbKvnE1": {
+    "name": "嘎嘎好",
+    "url": "https://pastebin.com/raw/gtbKvnE1",
+    "src": "seed"
+  },
+  "https://xn--sdds-rp5imh.v.nxog.top/apitv.php?id-3": {
+    "name": "sdds(id-3)",
+    "url": "https://xn--sdds-rp5imh.v.nxog.top/apitv.php?id-3",
+    "src": "seed"
+  },
+  "https://teach.link/7BgCf8": {
+    "name": "我的(teach.link)",
+    "url": "https://teach.link/7BgCf8",
+    "src": "seed"
+  },
+  "http://47.96.82.41:5188/rose/18/xgg.json": {
+    "name": "123",
+    "url": "http://47.96.82.41:5188/rose/18/xgg.json",
+    "src": "seed"
+  },
+  "https://xn--zq2ao005e.u.xn--dkw.xn--6qq986b3xl/apia.php?id=1": {
+    "name": "欧",
+    "url": "https://xn--zq2ao005e.u.xn--dkw.xn--6qq986b3xl/apia.php?id=1",
+    "src": "seed"
+  },
+  "http://z.qiqiv.cn/123.txt": {
+    "name": "我的TV接口",
+    "url": "http://z.qiqiv.cn/123.txt",
+    "src": "seed"
+  },
+  "https://9763.kstore.vip/aowu.json": {
+    "name": "大嗷呜",
+    "url": "https://9763.kstore.vip/aowu.json",
+    "src": "seed"
+  },
+  "http://fty.xxooo.cf/tv": {
+    "name": "饭太硬",
+    "url": "http://fty.xxooo.cf/tv",
+    "src": "seed"
+  },
+  "http://tv.nxog.top": {
+    "name": "欧拉",
+    "url": "http://tv.nxog.top",
+    "src": "seed"
+  },
+  "https://www.xn--4kq62z5rby2qupq9ub.top/": {
+    "name": "王二小放牛娃(备用)",
+    "url": "https://www.xn--4kq62z5rby2qupq9ub.top/",
+    "src": "seed"
+  },
+  "https://www.iyouhun.com/tv/fty": {
+    "name": "hhh",
+    "url": "https://www.iyouhun.com/tv/fty",
+    "src": "seed"
+  },
+  "https://gitlab.com/noimank/tvbox/-/raw/main/tvbox1.json": {
+    "name": "noimank",
+    "url": "https://gitlab.com/noimank/tvbox/-/raw/main/tvbox1.json",
+    "src": "seed"
+  },
+  "http://Link3.cc/uuccc": {
+    "name": "影视仓2",
+    "url": "http://Link3.cc/uuccc",
+    "src": "seed"
+  },
+  "https://gh-proxy.com/https://raw.githubusercontent.com/1771245847/TvBox/master/tvbox.json": {
+    "name": "TvBox单仓",
+    "url": "https://gh-proxy.com/https://raw.githubusercontent.com/1771245847/TvBox/master/tvbox.json",
+    "src": "seed"
+  },
+  "https://android.lushunming.qzz.io/json/index.json": {
+    "name": "接口",
+    "url": "https://android.lushunming.qzz.io/json/index.json",
+    "src": "seed"
+  },
+  "https://clun.top/fun.json": {
+    "name": "clun-fun",
+    "url": "https://clun.top/fun.json",
+    "src": "seed"
+  },
+  "http://xtvantsc.xyz/4gtv.json": {
+    "name": "1",
+    "url": "http://xtvantsc.xyz/4gtv.json",
+    "src": "seed"
+  },
+  "https://www.252035.xyz/z/FongMi.json": {
+    "name": "tv(FongMi)",
+    "url": "https://www.252035.xyz/z/FongMi.json",
+    "src": "seed"
+  }
+}
