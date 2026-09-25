@@ -298,9 +298,12 @@ def main():
     for i, s in enumerate(stores, 1):
         print(f"  {i:2d}. {s['name']}  <-  {s['url']}")
 
-    # 6) 构建"自建聚合单仓" mybox.json（合并活源的直连站点，导入即出全部站点）
+    # 6) 自建单仓 mybox.json：只合并"精选源"（锚点 + 精选16），站点数可控、加载快
+    curated_map = {}
+    for s in selected:
+        curated_map[s["url"]] = pool.get(s["url"], {"name": s["name"], "url": s["url"]})
     try:
-        build_single(pool, alive, ANCHOR_URLS)
+        build_single(pool, curated_map, ANCHOR_URLS)
     except Exception as e:
         print(f"[单仓] 构建失败: {e}")
 
