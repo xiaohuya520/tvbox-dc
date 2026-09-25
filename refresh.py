@@ -44,6 +44,10 @@ BIG_KEYWORDS = [
     "Yoursmile7", "xiaolong69",
 ]
 
+# 自建单仓 mybox.json 默认 spider（兜底用，优先复用首个成功源自带的 spider）
+SPIDER_DEFAULT = "https://cdn.jsdelivr.net/gh/CatVod/CatVodSpider@main/jar/custom_spider.jar"
+SINGLE = os.path.join(ROOT, "mybox.json")
+
 # 借鉴其他多仓（Lightconer 影视仓聚合仓库）的单仓，走 jsDelivr 镜像，国内快
 LIGHTCONER_GHAGG = {
     "肥猫(借鉴多仓)": "https://cdn.jsdelivr.net/gh/Lightconer/tvbox-ysc-config@main/output/feimao.json",
@@ -148,6 +152,53 @@ def short_name(meta):
     return meta.get("name") or meta.get("url")
 
 
+def build_single(pool, alive, anchors):
+    """合并所有存活源的 type=3 直连站点 + 直播，生成一个聚合单仓 mybox.json。
+    锚点强制纳入；去重 key 防止冲突。spider 优先复用首个源的，兜底用 CatVod 公用 jar。
+    """
+    sites, seen_keys = {}, set()
+    lives, seen_live = [], set()
+    spider_val = None
+    urls = list(alive.keys())
+    for au in anchors:
+        if au not in urls:
+            urls.append(au)
+    for u in urls:
+        text, _ = fetch(u)
+        if not text:
+            continue
+        try:
+            d = json.loads(text)
+        except Exception:
+            continue
+        sp = d.get("spider")
+        if sp and not spider_val:
+            spider_val = sp
+        for s in d.get("sites", []):
+            t = s.get("type")
+            if t is not None and str(t) != "3":
+                continue  # 只收直连采集站，跨源通用、冲突最小
+            key = s.get("key") or s.get("name")
+            if not key or key in seen_keys:
+                continue
+            seen_keys.add(key)
+            sites[key] = s
+        for lv in d.get("lives", []):
+            nm = lv.get("name") or lv.get("url")
+            if not nm or nm in seen_live:
+                continue
+            seen_live.add(nm)
+            lives.append(lv)
+    single = {
+        "spider": spider_val or SPIDER_DEFAULT,
+        "sites": list(sites.values()),
+        "lives": lives,
+    }
+    json.dump(single, open(SINGLE, "w", encoding="utf-8"),
+              ensure_ascii=False, indent=2)
+    print(f"[单仓] mybox.json 写入 sites={len(sites)} lives={len(lives)}")
+
+
 def main():
     # 1) 加载/初始化候选池
     pool = {}
@@ -246,6 +297,12 @@ def main():
     print(f"[精选] 写入 {len(stores)} 条")
     for i, s in enumerate(stores, 1):
         print(f"  {i:2d}. {s['name']}  <-  {s['url']}")
+
+    # 6) 构建"自建聚合单仓" mybox.json（合并活源的直连站点，导入即出全部站点）
+    try:
+        build_single(pool, alive, ANCHOR_URLS)
+    except Exception as e:
+        print(f"[单仓] 构建失败: {e}")
 
 
 if __name__ == "__main__":
