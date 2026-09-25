@@ -1,0 +1,94 @@
+{
+  "stores": [
+    {
+      "name": "饭太硬",
+      "url": "https://qist.wyfc.qzz.io/fty.json"
+    },
+    {
+      "name": "潇洒",
+      "url": "https://qist.wyfc.qzz.io/xiaosa/api.json"
+    },
+    {
+      "name": "OK影视",
+      "url": "https://raw.liucn.cc/box/m.json"
+    },
+    {
+      "name": "摸鱼儿",
+      "url": "https://6800.kstore.vip/fish.json"
+    },
+    {
+      "name": "ls660飞猫",
+      "url": "https://www.ls660.com/TV/feimao.json"
+    },
+    {
+      "name": "PG",
+      "url": "https://www.252035.xyz/p/jsm.json"
+    },
+    {
+      "name": "tv(FongMi)",
+      "url": "https://www.252035.xyz/z/FongMi.json"
+    },
+    {
+      "name": "noimank",
+      "url": "https://gitlab.com/noimank/tvbox/-/raw/main/tvbox1.json"
+    },
+    {
+      "name": "王二小",
+      "url": "https://9280.kstore.vip/newwex.json"
+    },
+    {
+      "name": "少儿频道",
+      "url": "https://jihulab.com/ymz1231/xymz/-/raw/main/ymshaoer"
+    },
+    {
+      "name": "clun-fun",
+      "url": "https://clun.top/fun.json"
+    }
+  ],
+  "urls": [
+    {
+      "url": "https://qist.wyfc.qzz.io/fty.json",
+      "name": "饭太硬"
+    },
+    {
+      "url": "https://qist.wyfc.qzz.io/xiaosa/api.json",
+      "name": "潇洒"
+    },
+    {
+      "url": "https://raw.liucn.cc/box/m.json",
+      "name": "OK影视"
+    },
+    {
+      "url": "https://6800.kstore.vip/fish.json",
+      "name": "摸鱼儿"
+    },
+    {
+      "url": "https://www.ls660.com/TV/feimao.json",
+      "name": "ls660飞猫"
+    },
+    {
+      "url": "https://www.252035.xyz/p/jsm.json",
+      "name": "PG"
+    },
+    {
+      "url": "https://www.252035.xyz/z/FongMi.json",
+      "name": "tv(FongMi)"
+    },
+    {
+      "url": "https://gitlab.com/noimank/tvbox/-/raw/main/tvbox1.json",
+      "name": "noimank"
+    },
+    {
+      "url": "https://9280.kstore.vip/newwex.json",
+      "name": "王二小"
+    },
+    {
+      "url": "https://jihulab.com/ymz1231/xymz/-/raw/main/ymshaoer",
+      "name": "少儿频道"
+    },
+    {
+      "url": "https://clun.top/fun.json",
+      "name": "clun-fun"
+    }
+  ]
+}
