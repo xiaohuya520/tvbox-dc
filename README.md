@@ -24,6 +24,18 @@
 
 1. 饭太硬 · 2. 潇洒 · 3. ok(liucn) · 4. 老刘备 · 5. 摸鱼儿 · 6. 飞猫(ls660) · 7. PG · 8. FongMi · 9. noimank · 10. 欧歌接口 · 11. 影视仓 · 12. 王二小 · 13. 香雅情 · 14. ZYplayer · 15. 宝盒VIP · 16. 少儿频道 · 17. 极速 · 18. TvBox单仓 · 19. CatVodSpider · 20. clun-fun
 
+## 自动刷新（GitHub Actions）
+
+仓库内置定时任务 `.github/workflows/refresh.yml`，每天北京时间 00:00 自动运行 `refresh.py`：
+
+1. 探测 `dc.json` 现有 20 个源是否存活（HTTP 可达 + 响应体是 TVBox 配置）；
+2. **删除失效源**，并从候选池 `sources_pool.json` 里补充存活的，补足 20 个；
+3. 候选池 = 内置 93 条种子源（`dc_full.json`）+ 从外部聚合页（默认 tvbox.clbug.com）抓取的最新源，只增不删；
+4. 有变化才提交，导入链接不变。
+
+即「删失效 + 补最新」全自动，保证精选始终是最新的可用源。可到仓库 Actions 页手动 `Run workflow` 立即触发。
+
 ## 更新方法
 
-修改对应 `dc.json` / `dc_full.json` 里的 `stores` / `urls` 数组后（两个字段保持同步），重新推送到本仓库 `main` 分支即可，导入链接不变。
+- 自动：等 Actions 每日刷新，或手动触发。
+- 手动：修改 `dc.json` / `dc_full.json` 的 `stores` / `urls` 数组（两字段同步），推到 `main` 即可，导入链接不变。
