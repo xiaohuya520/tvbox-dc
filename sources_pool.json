@@ -463,5 +463,10 @@
     "name": "tv(FongMi)",
     "url": "https://www.252035.xyz/z/FongMi.json",
     "src": "seed"
+  },
+  "https://pan.wpcoder.cn/?dir=tvbox": {
+    "name": "https://pan.wpcoder.cn/?dir=tvbox",
+    "url": "https://pan.wpcoder.cn/?dir=tvbox",
+    "src": "external"
   }
 }
