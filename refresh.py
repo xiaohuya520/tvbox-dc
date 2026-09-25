@@ -25,10 +25,32 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 CURATED = os.path.join(ROOT, "dc.json")
 POOL = os.path.join(ROOT, "sources_pool.json")
 SEED = os.path.join(ROOT, "dc_full.json")
-TARGET = 20
+TARGET = 16
 
 # 补充优先级（越小越优先）
 PRIORITY = {"seed": 0, "gh": 0, "ghagg": 1, "external": 2}
+
+# 锚点：用户指定必须保留（即使探测失败也保留，好用源）
+ANCHOR_URLS = [
+    "https://9280.kstore.vip/newwex.json",   # 王二小
+    "https://9877.kstore.space/sun.json",    # 新潇洒 sun
+]
+
+# 资源多大仓优先关键字（命中则优先补入精选，保证"资源多"）
+BIG_KEYWORDS = [
+    "newwex.json", "sun.json", "feimao", "ouge", "4k.json", "fty.json",
+    "xiaosa", "fish.json", "liucn.cc", "noimank", "FongMi", "ls660",
+    "YGBH", "252035.xyz", "clun.top", "aowu.json", "gaotianliuyun",
+    "Yoursmile7", "xiaolong69",
+]
+
+# 借鉴其他多仓（Lightconer 影视仓聚合仓库）的单仓，走 jsDelivr 镜像，国内快
+LIGHTCONER_GHAGG = {
+    "肥猫(借鉴多仓)": "https://cdn.jsdelivr.net/gh/Lightconer/tvbox-ysc-config@main/output/feimao.json",
+    "讴歌(借鉴多仓)": "https://cdn.jsdelivr.net/gh/Lightconer/tvbox-ysc-config@main/output/ouge.json",
+    "4K影视(借鉴多仓)": "https://cdn.jsdelivr.net/gh/Lightconer/tvbox-ysc-config@main/output/4k.json",
+    "王二小(借鉴多仓)": "https://cdn.jsdelivr.net/gh/Lightconer/tvbox-ysc-config@main/output/wangerxiao.json",
+}
 
 # 网页型聚合页（best-effort 抓链接，含中文域名/纯文本 URL）
 EXTERNAL_SOURCES = [
@@ -160,6 +182,11 @@ def main():
                 if link not in pool:
                     pool[link] = {"name": link, "url": link, "src": "external"}
                     new_ext += 1
+    # 2.4) 借鉴其他多仓：Lightconer 影视仓聚合仓库的单仓（走 jsDelivr 镜像）
+    for nm, u in LIGHTCONER_GHAGG.items():
+        if u not in pool:
+            pool[u] = {"name": nm, "url": u, "src": "ghagg"}
+
     print(f"[池] 总数 {len(pool)}，本次新增外部 {new_ext}")
 
     # 3) 并发探测
@@ -175,22 +202,38 @@ def main():
                 pass
     print(f"[探测] 存活 {len(alive)} / 池 {len(pool)}")
 
-    # 4) 构建精选（维持顺序：原精选存活优先 → 按优先级补满）
-    curated = json.load(open(CURATED, encoding="utf-8"))["stores"]
+    # 4) 构建精选（锚点强制 → 原精选存活 → 资源多大仓优先补满）
     selected, seen = [], set()
+
+    # 4.0 锚点：用户指定必须保留（即使探测失败也保留）
+    for au in ANCHOR_URLS:
+        if au not in seen:
+            meta = pool.get(au, {"name": au.rsplit("/", 1)[-1].rsplit(".", 1)[0],
+                                 "url": au, "src": "seed"})
+            selected.append({"name": meta.get("name") or "锚点", "url": au})
+            seen.add(au)
+
+    # 4.1 原精选中存活的（非锚点）保留
+    curated = json.load(open(CURATED, encoding="utf-8"))["stores"]
     for s in curated:
         u = s["url"]
+        if u in seen:
+            continue
         if u in alive and u not in seen:
             selected.append(s)
             seen.add(u)
-    alive_sorted = sorted(alive.items(),
-                          key=lambda kv: PRIORITY.get(kv[1].get("src"), 9))
-    for u, meta in alive_sorted:
+
+    # 4.2 补满：先资源多大仓(BIG)，再按来源优先级
+    def rank(u):
+        meta = pool.get(u, {})
+        big = 0 if any(k in u for k in BIG_KEYWORDS) else 1
+        return (big, PRIORITY.get(meta.get("src"), 9))
+
+    rest = sorted([u for u in alive if u not in seen], key=rank)
+    for u in rest:
         if len(selected) >= TARGET:
             break
-        if u in seen or u not in alive:
-            continue
-        selected.append({"name": short_name(meta), "url": u})
+        selected.append({"name": short_name(pool[u]), "url": u})
         seen.add(u)
     selected = selected[:TARGET]
 
