@@ -1,0 +1,43 @@
+name: Build self spider box
+
+# 我们自己写的爬虫（Node.js）每天自动探测在线资源站，生成 mybox-self.json
+on:
+  schedule:
+    - cron: '30 16 * * *'   # 北京时间每天 00:30（UTC 16:30）
+  workflow_dispatch:        # 允许在 Actions 页面手动触发
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run crawler
+        run: node maccms_crawler.js
+
+      - name: Commit & push if changed
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${TOKEN}@github.com/${REPO}.git"
+          git add mybox-self.json
+          if git diff --cached --quiet; then
+            echo "无变化，跳过提交"
+          else
+            git commit -m "auto: 重建自建爬虫单仓 mybox-self.json $(date +%Y-%m-%d)"
+            git pull --rebase --no-edit origin main || true
+            git push
+          fi
