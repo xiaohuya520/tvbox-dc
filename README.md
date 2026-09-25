@@ -4,7 +4,11 @@
 
 ## 直接导入链接
 
-**自己的单仓 mybox.json（聚合所有好源的站点，导入即出全部站点，不用选仓库，加载最快）** ← 本次主推
+**自己的爬虫单仓 mybox-self.json（纯 JS 爬虫探测在线苹果CMS资源站生成，完全自己可控、随时加站）** ← 本次主推
+- `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json`
+- 国内镜像：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-self.json`
+
+**自己的单仓 mybox.json（聚合所有好源的站点，导入即出全部站点，不用选仓库，加载最快）**
 - `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox.json`
 - 国内镜像：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox.json`
 
@@ -78,6 +82,21 @@
 即「删失效 + 补最新 + 保资源多 + 自建单仓自动聚合」全自动。可到仓库 Actions 页手动 `Run workflow` 立即触发。
 
 > 注意：`dc_fast.json` 为手动维护，不在自动刷新范围内（避免自动补入慢源）。
+
+## 自建爬虫单仓（maccms_crawler.js）
+
+这是**我们自己写的爬虫程序**（纯 JS、不用编译），生成 `mybox-self.json`：
+
+- 原理：圈内绝大多数综合影视站底层都是**苹果CMS v10**，自带标准 API（`/api.php/provide/vod`），
+  TVBox 原生 `type:1` 就能直接抓，**不需要写复杂 spider**。所以我们「自己的单仓」= 自己写的
+  爬虫去**探测哪些资源站在线的**，把在线的打包成单仓 JSON —— 完全可控、随时增删、自动保鲜。
+- 文件：`maccms_crawler.js`（Node.js，可本地 `node maccms_crawler.js` 运行）
+- 自动化：`.github/workflows/crawl.yml` 每天北京时间 00:30 自动跑，重建 `mybox-self.json` 并推送
+  （同样可在 Actions 页手动 `Run workflow` 立即触发）。
+- **怎么加自己的站**：打开 `maccms_crawler.js`，在 `CANDIDATES` 数组里加一行
+  `{ key: 'xxx', name: '站名', api: 'https://你的站/api.php/provide/vod' }` 即可，下次自动生效。
+- 和 `mybox.json` 的区别：`mybox.json` 是把别人单仓里的站点**搬运合并**；`mybox-self.json` 是
+  **我们自己探测+打包的资源站**，更可控、不依赖任何第三方单仓成品。
 
 ## 更新方法
 
