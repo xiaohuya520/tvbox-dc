@@ -3,12 +3,14 @@
 """TVBox 多仓自动刷新（运行在 GitHub Actions 云端，能正常联网探测）。
 
 流程：
-  1. 候选池 sources_pool.json = seed(来自 dc_full.json 的 93 条) + external(外部聚合页抓取)，只增不删
+  1. 候选池 sources_pool.json = seed(来自 dc_full.json 的 93 条) + gh(GitHub 直链单仓)
+     + ghagg(GitHub 聚合仓库目录列举) + external(网页聚合页抓取)，只增不删
   2. 并发探测池内所有源是否存活（HTTP 可达 + 响应体像 TVBox 配置）
   3. 精选 dc.json 维持 TARGET 个：先保留原精选中存活的，再从可用集按优先级补满
-     - 补充优先级：seed(已筛选的高质量源) 优先，external(外部新抓) 兜底
+     - 补充优先级：seed/gh(高质量源) 优先，ghagg 次之，external(外部新抓) 兜底
   4. 写回 dc.json（双格式 stores+urls）与 sources_pool.json
-外部源地址可在 EXTERNAL_SOURCES 配置；本地无网环境下不要直接运行本脚本（会清空精选）。
+外部源地址可在 EXTERNAL_SOURCES / GITHUB_RAW_SOURCES / GITHUB_AGGREGATORS 配置；
+本地无网环境下不要直接运行本脚本（会清空精选）。
 """
 import json
 import os
@@ -25,9 +27,31 @@ POOL = os.path.join(ROOT, "sources_pool.json")
 SEED = os.path.join(ROOT, "dc_full.json")
 TARGET = 20
 
-# 外部「最新源」聚合页（可增删）。best-effort：抓不到也不影响 seed 补充。
+# 补充优先级（越小越优先）
+PRIORITY = {"seed": 0, "gh": 0, "ghagg": 1, "external": 2}
+
+# 网页型聚合页（best-effort 抓链接，含中文域名/纯文本 URL）
 EXTERNAL_SOURCES = [
     "https://tvbox.clbug.com/user.php",
+    "https://tv.wmmfc.com/%E5%BD%B1%E8%A7%86-%E7%9B%B4%E6%92%AD%E6%8E%A5%E5%8F%A3",
+    "https://www.ymaoo.cn/2244.html",
+    "https://designshidai.com/?p=19467/",
+    "https://down.7po.com/article/2191.html",
+    "https://www.111cn.net/new/573294.htm",
+]
+
+# GitHub 直链单仓（知名维护者，长期稳定，优先补充）
+GITHUB_RAW_SOURCES = [
+    "https://raw.githubusercontent.com/liu673cn/box/main/m.json",
+    "https://raw.githubusercontent.com/FongMi/CatVodSpider/main/json/config.json",
+    "https://raw.githubusercontent.com/gaotianliuyun/gao/master/js.json",
+    "https://raw.githubusercontent.com/Yoursmile7/TVBox/main/XC.json",
+    "https://raw.githubusercontent.com/xiaolong69/tv/main/1.json",
+]
+
+# GitHub 聚合仓库（自动列举其输出目录的单仓 json，自带 Actions 更新）
+GITHUB_AGGREGATORS = [
+    ("Lightconer/tvbox-ysc-config", "output"),
 ]
 
 UA = {
@@ -48,6 +72,24 @@ def fetch(url, timeout=10):
         return None, None
 
 
+def fetch_github_dir(repo, path):
+    """列举 GitHub 仓库目录，返回其中的 .json 直链（download_url）。"""
+    api = f"https://api.github.com/repos/{repo}/contents/{path}"
+    out = []
+    try:
+        req = urllib.request.Request(api, headers=UA)
+        with urllib.request.urlopen(req, timeout=15, context=CTX) as r:
+            data = json.loads(r.read().decode("utf-8", "ignore"))
+        for item in data:
+            if item.get("type") == "file" and item.get("name", "").lower().endswith(".json"):
+                dl = item.get("download_url")
+                if dl:
+                    out.append(dl)
+    except Exception as e:
+        print(f"[gh-dir] 列举 {repo}/{path} 失败: {e}")
+    return out
+
+
 def is_config(text):
     if not text:
         return False
@@ -61,6 +103,9 @@ def is_config(text):
 def extract_links(html):
     links = set()
     for m in re.findall(r'href=["\'](https?://[^"\']+)["\']', html):
+        links.add(m.split("#")[0].rstrip("/"))
+    # 纯文本 URL（捕获未包在 href 内的，如聚合页里的接口列表）
+    for m in re.findall(r'(?:^|[\s("\'<>])(https?://[^\s"\'<>]+)', html):
         u = m.split("#")[0].rstrip("/")
         if re.search(r"\.json", u, re.I) or "tvbox" in u.lower():
             links.add(u)
@@ -93,7 +138,20 @@ def main():
         for s in json.load(open(SEED, encoding="utf-8"))["stores"]:
             pool.setdefault(s["url"], {"name": s["name"], "url": s["url"], "src": "seed"})
 
-    # 2) 抓取外部最新源并入池
+    # 2.1) GitHub 直链单仓
+    for u in GITHUB_RAW_SOURCES:
+        if u not in pool:
+            pool[u] = {"name": u.rsplit("/", 1)[-1].rsplit(".", 1)[0],
+                       "url": u, "src": "gh"}
+
+    # 2.2) GitHub 聚合仓库目录
+    for repo, path in GITHUB_AGGREGATORS:
+        for dl in fetch_github_dir(repo, path):
+            if dl not in pool:
+                nm = dl.rsplit("/", 1)[-1].rsplit(".", 1)[0]
+                pool[dl] = {"name": nm, "url": dl, "src": "ghagg"}
+
+    # 2.3) 网页型聚合页
     new_ext = 0
     for src_url in EXTERNAL_SOURCES:
         html, _ = fetch(src_url)
@@ -106,7 +164,7 @@ def main():
 
     # 3) 并发探测
     alive = {}
-    with ThreadPoolExecutor(max_workers=12) as ex:
+    with ThreadPoolExecutor(max_workers=16) as ex:
         futs = {ex.submit(check, u): u for u in pool}
         for f in as_completed(futs):
             u = futs[f]
@@ -117,7 +175,7 @@ def main():
                 pass
     print(f"[探测] 存活 {len(alive)} / 池 {len(pool)}")
 
-    # 4) 构建精选（维持顺序：原精选存活优先 → seed 补 → external 补）
+    # 4) 构建精选（维持顺序：原精选存活优先 → 按优先级补满）
     curated = json.load(open(CURATED, encoding="utf-8"))["stores"]
     selected, seen = [], set()
     for s in curated:
@@ -125,7 +183,9 @@ def main():
         if u in alive and u not in seen:
             selected.append(s)
             seen.add(u)
-    for u, meta in pool.items():
+    alive_sorted = sorted(alive.items(),
+                          key=lambda kv: PRIORITY.get(kv[1].get("src"), 9))
+    for u, meta in alive_sorted:
         if len(selected) >= TARGET:
             break
         if u in seen or u not in alive:
