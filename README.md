@@ -4,20 +4,20 @@
 
 ## 直接导入链接
 
-**极速版（11 条，只留国内托管/较快的源，加载最快，推荐）**
-- `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/dc_fast.json`
-- 国内镜像：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dc_fast.json`
-
-**精选版（20 条，通用）**
+**精选版（16 条，资源多大仓，推荐日常用）** ← 本次主用
 - `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/dc.json`
 - 国内镜像：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dc.json`
+
+**极速版（11 条，只留国内托管/较快的源，加载最快，追求速度备用）**
+- `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/dc_fast.json`
+- 国内镜像：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dc_fast.json`
 
 **完整版（93 条，备用）**
 - `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/dc_full.json`
 - 国内镜像：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dc_full.json`
 
 > 国内访问 `raw.githubusercontent.com` 常常很慢，优先用 jsDelivr 镜像，或试
-> `https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/dc_fast.json`。
+> `https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/dc.json`。
 
 ## 格式说明（双兼容）
 
@@ -28,6 +28,29 @@
 
 两种字段内容完全一致，只是字段顺序/命名不同。壳子一般只读自己认识的那个字段，互不影响。
 
+## 精选版 16 条清单（资源多 + 可用）
+
+> 以用户指定的两个锚点开头，其余全部为圈内资源多、长期维护的大单仓；
+> 其中「肥猫 / 讴歌 / 4K影视」借鉴自 Lightconer 影视仓聚合仓库（其他多仓），
+> 走 jsDelivr 镜像，国内可直连。
+
+1. 王二小（王小二）— `https://9280.kstore.vip/newwex.json`　★锚点
+2. 新潇洒 sun — `https://9877.kstore.space/sun.json`　★锚点
+3. 肥猫（借鉴多仓）— `https://cdn.jsdelivr.net/gh/Lightconer/tvbox-ysc-config@main/output/feimao.json`
+4. 讴歌（借鉴多仓）— `https://cdn.jsdelivr.net/gh/Lightconer/tvbox-ysc-config@main/output/ouge.json`
+5. 4K影视（借鉴多仓）— `https://cdn.jsdelivr.net/gh/Lightconer/tvbox-ysc-config@main/output/4k.json`
+6. 饭太硬 — `https://qist.wyfc.qzz.io/fty.json`
+7. 潇洒 — `https://qist.wyfc.qzz.io/xiaosa/api.json`
+8. 摸鱼儿 — `https://6800.kstore.vip/fish.json`
+9. OK影视 — `https://raw.liucn.cc/box/m.json`
+10. noimank — `https://gitlab.com/noimank/tvbox/-/raw/main/tvbox1.json`
+11. FongMi — `https://cdn.jsdelivr.net/gh/FongMi/CatVodSpider@main/json/config.json`
+12. ls660飞猫 — `https://www.ls660.com/TV/feimao.json`
+13. 宝盒VIP — `https://cdn.jsdelivr.net/gh/guot55/YGBH@main/vip2.json`
+14. PG — `https://www.252035.xyz/p/jsm.json`
+15. clun-fun — `https://clun.top/fun.json`
+16. 大嗷呜 — `https://9763.kstore.vip/aowu.json`
+
 ## 极速版 11 条清单
 
 > 剔除原则：`raw.githubusercontent.com` 直连、`gh-proxy` 二次代理、采集站 API、php 动态接口、
@@ -35,21 +58,18 @@
 
 饭太硬 · 潇洒 · OK影视(liucn) · 摸鱼儿 · ls660飞猫 · PG · tv(FongMi) · noimank · 王二小 · 少儿频道 · clun-fun
 
-## 精选版 20 条清单
-
-饭太硬 · 潇洒 · ok(liucn) · liu673cn(jsDelivr) · 摸鱼儿 · ls660飞猫 · PG · tv(FongMi) · noimank · 欧歌接口 · 影视仓 · 王二小 · 香雅情 · zy(ZYplayer) · 宝盒VIP · 少儿频道 · 极速 · TvBox单仓 · 我的(CatVodSpider) · clun-fun
-
 ## 自动刷新（GitHub Actions）
 
 仓库内置定时任务 `.github/workflows/refresh.yml`，每天北京时间 00:00 自动运行 `refresh.py`：
 
 1. 探测候选池内所有源是否存活（HTTP 可达 + 响应体是 TVBox 配置）；
-2. 精选 `dc.json` 维持 20 个：先保留原精选中存活的，再从可用集按优先级补满；
-3. 候选池 `sources_pool.json` = 内置 93 条种子 + 5 条 GitHub 直链单仓 + 聚合仓库(ScriptTV/Lightconer 等)
+2. **锚点强制保留**：王二小、新潇洒 sun 这两个用户指定源，即使探测失败也留在精选；
+3. 精选 `dc.json` 维持 16 个：锚点 → 原精选存活 → **资源多大仓优先**补满；
+4. 候选池 `sources_pool.json` = 内置 93 条种子 + 5 条 GitHub 直链单仓 + 借鉴多仓(Lightconer 肥猫/讴歌/4K)
    + 6 个网页聚合页抓取，**只增不删**；
-4. 有变化才提交，导入链接不变。
+5. 有变化才提交，导入链接不变。
 
-即「删失效 + 补最新」全自动。可到仓库 Actions 页手动 `Run workflow` 立即触发。
+即「删失效 + 补最新 + 保资源多」全自动。可到仓库 Actions 页手动 `Run workflow` 立即触发。
 
 > 注意：`dc_fast.json` 为手动维护，不在自动刷新范围内（避免自动补入慢源）。
 
