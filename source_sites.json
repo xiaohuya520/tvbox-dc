@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-26T01:41:47.072Z",
+  "updated": "2026-09-26T01:59:18.512Z",
   "total": 30,
   "results": [
     {
@@ -66,7 +66,7 @@
       "name": "暴风资源",
       "api": "https://bfzyapi.com/api.php/provide/vod",
       "ok": true,
-      "count": 160353
+      "count": 160355
     },
     {
       "name": "天涯资源",
@@ -90,7 +90,7 @@
       "name": "非凡资源",
       "api": "https://ffzy5.tv/api.php/provide/vod",
       "ok": true,
-      "count": 98238
+      "count": 98239
     },
     {
       "name": "无尽资源",
