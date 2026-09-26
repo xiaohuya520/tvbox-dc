@@ -1,19 +1,8 @@
 {
   "sites": [
     {
-      "key": "DolbyHome26",
-      "name": "我的杜比资源站(原生搜索)",
-      "type": 0,
-      "api": "https://xiaohuya520.github.io/tvbox-dc/dolby/catalog.json",
-      "searchable": 1,
-      "quickSearch": 1,
-      "filterable": 1,
-      "playable": 1,
-      "timeout": 15
-    },
-    {
       "key": "DolbySpider26",
-      "name": "我的杜比资源站(蜘蛛精确搜索)",
+      "name": "我的杜比资源站(可搜索)",
       "type": 3,
       "api": "https://xiaohuya520.github.io/tvbox-dc/dolby/spider.js",
       "ext": {
@@ -25,7 +14,19 @@
       },
       "searchable": 1,
       "quickSearch": 1,
-      "playable": 1
+      "playable": 1,
+      "timeout": 15
+    },
+    {
+      "key": "DolbyHome26",
+      "name": "我的杜比资源站(浏览兜底)",
+      "type": 0,
+      "api": "https://xiaohuya520.github.io/tvbox-dc/dolby/catalog.json",
+      "searchable": 0,
+      "quickSearch": 0,
+      "filterable": 1,
+      "playable": 1,
+      "timeout": 15
     }
   ]
 }
