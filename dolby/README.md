@@ -6,10 +6,12 @@
 
 ## 成品链接（推送后可用）
 
-**主站点（type:3 drpy 蜘蛛，可搜索）**：`spider.js` 在 TVBox 内读取 `catalog.json`
-并按中文关键词客户端过滤，纯 GitHub 托管即可搜。
-**兜底站点（type:0 MacCMS 静态接口，只浏览）**：`catalog.json` 已是 MacCMS 完整格式，
-用来浏览；因 GitHub Pages 静态无法按关键词过滤，搜索请以蜘蛛站点/全局搜索为准。
+**主站点（type:0 + spider.js 挂载，可搜索）**：`spider.js` 走影视仓/猫vod 的 JsLoader，
+在 TVBox 内读取 `catalog.json` 并按中文关键词客户端过滤，纯 GitHub 托管即可搜。
+（写法要点：站点写 `type:0` + 顶层 `spider` 字段指向 `.js`，**不要写 `type:3`**——
+很多影视仓版本把 `type:3` 当 jar 包用 JarLoader 加载，`.js` 会被当成 jar 解析失败，整站加载不出来。）
+**兜底站点（type:0 纯静态，只浏览）**：`catalog.json` 已是 MacCMS 完整格式，
+用来浏览；因 GitHub Pages 静态无法按关键词过滤，搜索请用第一个带 spider 的站点/全局搜索。
 
 - 订阅导入：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/subscribe.json`
 - 目录数据：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json`
@@ -23,7 +25,7 @@ TVBox 的 `type:0`（MacCMS 原生）搜索，是把关键词拼成 `api?ac=vide
 静态服务器**根本不会按 `wd` 过滤**——任何搜索请求都原样返回全部 129 条（甚至被壳子解析成 0 条）。
 所以「type:0 静态站」从原理上就做不了真正的搜索过滤，这正是你一直“搜不到/没找到数据”的原因。
 
-**解决（已上线）**：搜索改用 **`type:3` drpy 蜘蛛**（`spider.js`）。
+**解决（已上线）**：搜索改用 **`type:0` 站点 + `spider` 字段挂载的 drpy 蜘蛛**（`spider.js`）。
 蜘蛛在 **TVBox 内部（你的设备）** 读取 `catalog.json`，按你输入的中文关键词客户端过滤，
 不依赖任何服务器过滤，纯 GitHub 托管即可。已修复两个会“搜不到”的壳子兼容坑：
 1. 所有函数一律 `return JSON.stringify(...)`——兼容 catvod 老实现直接 `new JSONObject((String)ret)`，
@@ -31,14 +33,14 @@ TVBox 的 `type:0`（MacCMS 原生）搜索，是把关键词拼成 `api?ac=vide
 2. `search` 兼容两种壳子签名 `search(wd,quick,pg)` 与 `search(wd,pg)`，
    之前两参数调用时翻页算成 `NaN` 返回空列表。
 
-订阅里 **第一个站点「我的杜比资源站(可搜索)」就是 type:3 蜘蛛**（searchable:1）；
-第二个「浏览兜底」是 type:0 静态站（searchable:0，只用来浏览，不做搜索）。
+订阅里 **第一个站点「我的杜比资源站(可搜索)」就是 `type:0` + `spider` 字段挂载的 JS 蜘蛛**（searchable:1）；
+第二个「仅浏览」是纯 type:0 静态站（searchable:0，只用来浏览，不做搜索）。
 
 > **搜索预期行为**
 > - 全局搜索或点进蜘蛛站点搜「泰坦尼克号」→ 只出泰坦尼克号（精确，靠客户端过滤）。
 > - 已用真实目录在 node 里实测：两种签名都能命中「泰坦尼克号 4K原盘REMUX 杜比视界…」。
 
-**导入后请重拉订阅**：TVBox 设置里「清除缓存」→ 重新加载订阅链接，让新的 type:3 站点生效。
+**导入后请重拉订阅**：TVBox 设置里「清除缓存」→ 重新加载订阅链接，让新的 type:0+spider 站点生效。
 
 **备选订阅链接（jsdelivr 转圈时换这些）**：
 - GitHub Pages（推荐，国内一般可达）：
@@ -55,8 +57,8 @@ TVBox 的 `type:0`（MacCMS 原生）搜索，是把关键词拼成 `api?ac=vide
 3. **看卡在哪一层**：
    - 配置都加载不出来（界面空白）→ 订阅链接被墙，换 GitHub Pages 链接；
    - 能看到「我的杜比资源站」且能浏览列表 → 正常，说明 type:0 接口已通；
-   - 搜索没反应/一直空 → 确认导入的是**第一个 type:3 蜘蛛站点（可搜索）**，并清缓存重拉订阅；
-     若你的壳子不支持 JS 蜘蛛，静态 type:0 站本身无法按词过滤，需用支持蜘蛛的壳子；
+   - 搜索没反应/一直空 → 确认导入的是**第一个「可搜索」站点（它带 spider 字段）**，并清缓存重拉订阅；
+     若你的壳子（如旧版影视仓）禁用 JS 蜘蛛，type:0 站本身无法按词过滤，需要走云端过滤方案（见下方说明）；
    - 能看到影片列表但点播放转圈 → 正常，网盘链接需要配好网盘 cookie 才能播（见下方网盘章节）。
 4. **清缓存重进**：TVBox 设置里「清除缓存」后重新拉订阅。
 
@@ -224,7 +226,7 @@ python server.py --port 9000 # 自定义端口
 | `config.json` | 源地址 + 杜比关键词 + GitHub 目标 |
 | `crawler.py` | 爬虫：支持 `tg_channel`（Telegram原盘频道抓夸克/百度链接）、`maccms`（原盘站过滤）、`dolby_list`（Dolby官方片单+搜源）三种模式 |
 | `spider.js` | TVBox drpy 蜘蛛，读取 catalog.json 当资源站 |
-| `subscribe.json` | TVBox 站点导入入口（type:3 蜘蛛可搜索为主 + type:0 静态浏览兜底） |
+| `subscribe.json` | TVBox 站点导入入口（type:0 + spider.js 可搜索为主 + type:0 静态浏览兜底，影视仓兼容） |
 | `netdisk_parser.js` | 网盘解析蜘蛛模板（夸克/百度），播放侧需填你的 cookie/接口 |
 | `netdisk_config/server.py` | 本地网盘配置小站后端（复刻 SUN 面板，标准库无依赖） |
 | `netdisk_config/static/` | 配置小站前端页面（index.html + app.js） |
