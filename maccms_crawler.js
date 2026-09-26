@@ -26,8 +26,11 @@ const UA = 'okhttp/3.15';
 const TIMEOUT = 9000;
 
 // 自托管 jar 的对外地址（导入后的单仓只认这个，不再认 sun 的动态地址）
-// 实测（2026-09-26 用户宽带）：raw 超时、jsDelivr 拒载 jar(403)、gh-proxy 1秒拉完 1.8MB → 用 gh-proxy
+// 实测（2026-09-26 用户宽带）：raw 超时、jsDelivr 403'd jar、gh-proxy 1秒拉完 1.8MB → 用 gh-proxy
 const SELF_JAR_URL = 'https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/jar/sun_spider.jar';
+// 手机版 jar 地址：jsDelivr 屏蔽 .jar 扩展名，但 jar 本来就是图片伪装，存一份 .png 即可过 jsDelivr
+// （配合 crawl.yml 每天自动 purge jsDelivr 缓存，保证手机端拿到的永远是最新版）
+const SELF_JAR_CDN_URL = 'https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/jar/sun_spider.png';
 
 // ===== A. 候选苹果CMS资源站（type:1，TVBox 原生抓取）=====
 // 这就是「源头站点」池：不依赖 sun，每天探测，活的自动进单仓
@@ -193,6 +196,8 @@ async function main() {
         const jarDir = path.join(__dirname, 'jar');
         fs.mkdirSync(jarDir, { recursive: true });
         fs.writeFileSync(path.join(jarDir, 'sun_spider.jar'), r.buf);
+        // 同内容存一份 .png：jsDelivr 屏蔽 .jar 扩展名，png 可正常分发，手机端走 jsDelivr
+        fs.writeFileSync(path.join(jarDir, 'sun_spider.png'), r.buf);
         const localMd5 = crypto.createHash('md5').update(r.buf).digest('hex');
         if (jarMd5 && jarMd5 !== localMd5) {
           console.log(`  ⚠️ md5 不一致（sun声明=${jarMd5} 本地=${localMd5}），以本地为准`);
@@ -232,6 +237,20 @@ async function main() {
   const out = path.join(__dirname, 'mybox-self.json');
   fs.writeFileSync(out, JSON.stringify(box, null, 2), 'utf-8');
   console.log(`\n[完成] 资源站 ${sites.length - sunCount} + sun站 ${sunCount} = 共 ${sites.length} 个，spider ${spider ? '自托管OK' : '空'}，已写入 ${out}`);
+
+  // 手机版：spider 走 jsDelivr（png 伪装 jar），给 gh-proxy 不通的网络用
+  const boxCdn = JSON.parse(JSON.stringify(box));
+  const localJarPath = path.join(__dirname, 'jar', 'sun_spider.jar');
+  if (fs.existsSync(localJarPath)) {
+    const m = crypto.createHash('md5').update(fs.readFileSync(localJarPath)).digest('hex');
+    boxCdn.spider = `${SELF_JAR_CDN_URL};md5;${m}`;
+  }
+  fs.writeFileSync(
+    path.join(__dirname, 'mybox-self-cdn.json'),
+    JSON.stringify(boxCdn, null, 2),
+    'utf-8'
+  );
+  console.log(`[手机版] mybox-self-cdn.json 已写入（spider 走 jsDelivr png，gh-proxy 不通的手机用）`);
 
   // D) 纯净版单仓：只有 type:1 直连资源站，无 jar、无 type:3，任何壳子都能导入
   const pureSites = sites.filter((s) => s.type === 1);
