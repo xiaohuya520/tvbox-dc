@@ -1,0 +1,34 @@
+{
+  "github": {
+    "owner": "xiaohuya520",
+    "repo": "tvbox-dc",
+    "branch": "main",
+    "target_dir": "dolby"
+  },
+  "crawl": {
+    "page_size": 30,
+    "max_pages_per_source": 80,
+    "request_delay": 1.2,
+    "timeout": 20,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+  },
+  "dolby": {
+    "strict": true,
+    "keywords": [
+      "杜比", "杜比视界", "杜比全景声", "杜比atmos", "dolby",
+      "dolby vision", "dolby atmos", "全景声", "视界版", "杜比版"
+    ],
+    "also_allow_tags": ["4k", "4K原盘", "原盘", "蓝光", "uhd", "hdr"],
+    "require_4k_or_bluray": false,
+    "drop_keywords": ["抢先版", "枪版", "TC版", "DVD版", "高清枪版"]
+  },
+  "sources": [
+    {
+      "name": "示例杜比站A（替换为你的真实源）",
+      "type": "maccms",
+      "api": "https://example-dolby-site.com/api.php/provide/vod",
+      "enabled": false,
+      "play_flag": "杜比线路"
+    }
+  ]
+}
