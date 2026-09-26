@@ -335,7 +335,109 @@ class Handler(BaseHTTPRequestHandler):
             q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
             return self._send_json(self._qr_status(q.get("pollId", [""])[0],
                                                     q.get("provider", [""])[0]))
+        if p == "/tvbox/subscribe.json":
+            return self._send_json(self._tvbox_subscribe())
+        if p.endswith("/api.php/provide/vod"):
+            return self._tvbox_maccms()
+        if p == "/tvbox/spider.js":
+            return self._send_file(os.path.join("..", "spider.js"),
+                                   "application/javascript; charset=utf-8")
+        if p == "/tvbox/catalog.json":
+            return self._send_file(os.path.join("..", "data", "catalog.json"),
+                                   "application/json; charset=utf-8")
         self.send_error(404)
+
+    # ---- TVBox 本地源站 ----
+    def _base_url(self):
+        host = self.headers.get("Host", "127.0.0.1:8777")
+        return "http://%s" % host
+
+    def _tvbox_subscribe(self):
+        base = self._base_url()
+        api = base + "/tvbox/api.php/provide/vod"
+        return {
+            "spider": "",
+            "sites": [
+                {
+                    "key": "SelfDolby0",
+                    "name": "我的杜比资源站(本地)",
+                    "type": 0,
+                    "api": api,
+                    "searchable": 1,
+                    "quickSearch": 1,
+                    "filterable": 1,
+                    "playable": 1
+                },
+                {
+                    "key": "SelfDolby3",
+                    "name": "我的杜比资源站(蜘蛛)",
+                    "type": 3,
+                    "api": base + "/tvbox/spider.js",
+                    "ext": base + "/tvbox/catalog.json",
+                    "searchable": 1,
+                    "playable": 1
+                }
+            ]
+        }
+
+    def _load_catalog(self):
+        path = os.path.join(BASE, "..", "data", "catalog.json")
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {"total": 0, "list": []}
+
+    def _tvbox_maccms(self):
+        """MacCMS 原生 JSON 接口（type:0 直接用，无需任何蜘蛛）。
+        支持 ac=list（分类+首页）、t=分类、pg=、wd=搜索、ids=详情。"""
+        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        ac = q.get("ac", ["list"])[0]
+        pg = int(q.get("pg", ["1"])[0] or 1)
+        t = q.get("t", [""])[0]
+        wd = q.get("wd", [""])[0]
+        ids = q.get("ids", [""])[0]
+        cat = self._load_catalog()
+        items = cat.get("list", [])
+
+        if ids:
+            sel = [x for x in items if str(x.get("vod_id")) == ids]
+        elif wd:
+            sel = [x for x in items if wd.lower() in str(x.get("vod_name", "")).lower()]
+        elif t in ("1", "2", "3"):
+            tag = {"1": "夸克", "2": "百度", "3": None}[t]
+            if tag:
+                sel = [x for x in items if tag in str(x.get("vod_netdisk", ""))
+                       or tag in str(x.get("vod_play_from", ""))]
+            else:
+                sel = list(items)
+        else:
+            sel = list(items)
+
+        per = 30
+        total = len(sel)
+        start = (pg - 1) * per
+        page_items = sel[start:start + per]
+
+        if ac == "list" and not (wd or ids or t):
+            # 分类接口
+            resp = {
+                "class": [
+                    {"type_id": "1", "type_name": "夸克网盘"},
+                    {"type_id": "2", "type_name": "百度网盘"},
+                    {"type_id": "3", "type_name": "全部"},
+                ],
+                "list": page_items,
+            }
+        else:
+            resp = {"list": page_items}
+        resp.update({
+            "page": pg,
+            "pagecount": max(1, -(-total // per)),
+            "limit": str(per),
+            "total": total,
+        })
+        return self._send_json(resp)
 
     def do_POST(self):
         length = int(self.headers.get("Content-Length", 0) or 0)
