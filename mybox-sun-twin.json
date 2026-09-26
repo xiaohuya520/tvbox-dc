@@ -12,6 +12,34 @@
       "indexs": 1
     },
     {
+      "key": "wex_panconfig",
+      "name": "配置·中心",
+      "type": 3,
+      "api": "csp_PanConfigGuard",
+      "jar": "http://oss4liview.moji.com/thd_file/2026/09/24/06cf2230c30d9c26fa46ea79147b330d.jpg;md5;fc8f993c9297d38139363cd0e3db9853",
+      "searchable": 0,
+      "quickSearch": 0,
+      "changeable": 0,
+      "indexs": 0,
+      "style": {
+        "type": "list"
+      }
+    },
+    {
+      "key": "wex_mypan",
+      "name": "我的·网盘",
+      "type": 3,
+      "api": "csp_MyPanGuard",
+      "jar": "http://oss4liview.moji.com/thd_file/2026/09/24/06cf2230c30d9c26fa46ea79147b330d.jpg;md5;fc8f993c9297d38139363cd0e3db9853",
+      "searchable": 0,
+      "quickSearch": 0,
+      "changeable": 0,
+      "indexs": 0,
+      "style": {
+        "type": "list"
+      }
+    },
+    {
       "key": "hongniu",
       "name": "红牛资源",
       "type": 1,
@@ -1486,34 +1514,6 @@
       "filterable": 0,
       "changeable": 0,
       "hide": 1
-    },
-    {
-      "key": "wex_panconfig",
-      "name": "配置·中心",
-      "type": 3,
-      "api": "csp_PanConfigGuard",
-      "jar": "http://oss4liview.moji.com/thd_file/2026/09/24/06cf2230c30d9c26fa46ea79147b330d.jpg;md5;fc8f993c9297d38139363cd0e3db9853",
-      "searchable": 0,
-      "quickSearch": 0,
-      "changeable": 0,
-      "indexs": 0,
-      "style": {
-        "type": "list"
-      }
-    },
-    {
-      "key": "wex_mypan",
-      "name": "我的·网盘",
-      "type": 3,
-      "api": "csp_MyPanGuard",
-      "jar": "http://oss4liview.moji.com/thd_file/2026/09/24/06cf2230c30d9c26fa46ea79147b330d.jpg;md5;fc8f993c9297d38139363cd0e3db9853",
-      "searchable": 0,
-      "quickSearch": 0,
-      "changeable": 0,
-      "indexs": 0,
-      "style": {
-        "type": "list"
-      }
     }
   ],
   "lives": [

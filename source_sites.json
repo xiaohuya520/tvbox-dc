@@ -1,12 +1,12 @@
 {
-  "updated": "2026-09-26T05:31:48.946Z",
+  "updated": "2026-09-26T06:02:18.637Z",
   "total": 30,
   "results": [
     {
       "name": "红牛资源",
       "api": "https://hongniuzy2.com/api.php/provide/vod",
       "ok": true,
-      "count": 113062
+      "count": 113069
     },
     {
       "name": "量子资源",
@@ -24,19 +24,19 @@
       "name": "360资源",
       "api": "https://360zyzz.com/api.php/provide/vod",
       "ok": true,
-      "count": 71579
+      "count": 71584
     },
     {
       "name": "金鹰资源",
       "api": "http://jyzyapi.com/provide/vod",
       "ok": true,
-      "count": 113639
+      "count": 113648
     },
     {
       "name": "光速资源",
       "api": "http://api.guangsuapi.com/api.php/provide/vod",
       "ok": true,
-      "count": 113638
+      "count": 113645
     },
     {
       "name": "猫眼资源",
@@ -60,19 +60,19 @@
       "name": "闪电资源",
       "api": "http://sdzyapi.com/api.php/provide/vod",
       "ok": true,
-      "count": 123247
+      "count": 123253
     },
     {
       "name": "暴风资源",
       "api": "https://bfzyapi.com/api.php/provide/vod",
       "ok": true,
-      "count": 160359
+      "count": 160360
     },
     {
       "name": "天涯资源",
       "api": "https://tyyszy.com/api.php/provide/vod",
       "ok": true,
-      "count": 70440
+      "count": 70441
     },
     {
       "name": "茅台资源",
@@ -150,7 +150,7 @@
       "name": "极速资源",
       "api": "https://jszyapi.com/api.php/provide/vod",
       "ok": true,
-      "count": 111906
+      "count": 111913
     },
     {
       "name": "豆子资源",
@@ -180,7 +180,7 @@
       "name": "快车资源",
       "api": "https://caiji.kuaichezy.org/api.php/provide/vod",
       "ok": true,
-      "count": 124860
+      "count": 124866
     }
   ]
 }
