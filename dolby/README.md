@@ -66,6 +66,34 @@ python push_to_github.py
 - `drop_keywords`：枪版/抢先版直接丢弃。
 - `require_4k_or_bluray`：设 `true` 则额外要求带 4K/原盘标签（更严）。
 
+## 网盘（夸克/百度）支持
+
+4K原盘几乎都是网盘分享，所以「网盘配置」是刚需。整套分两层：
+
+**① 采集侧（已可用）**
+爬虫会自动从播放地址里识别夸克/百度/阿里/天翼/迅雷网盘链接，并把
+`vod_play_from` 标记为对应网盘名（如 `夸克网盘`）。`config.json` 的 `netdisk`
+段控制识别规则：
+```json
+"netdisk": {
+  "enabled": true,
+  "require_netdisk": false,   // 设 true 则只收网盘资源（纯原盘站用）
+  "labels": { "夸克网盘": ["pan.quark.cn"], "百度网盘": ["pan.baidu.com"] }
+}
+```
+若你的杜比源全是 4K原盘网盘，`require_netdisk: true` 最干净。
+
+**② 播放侧（需你的网盘凭据）**
+网盘分享链接不能直接播，要在 TVBox 里配「网盘解析」。本仓库给了模板
+`netdisk_parser.js`（drpy 蜘蛛）：
+- 在 TVBox 添加两个「网盘」站点，key 分别填 `夸克网盘`、`百度网盘`，
+  `api` 都指向 `netdisk_parser.js`，`ext` 填 `{"quark":"你的夸克cookie","baidu":"你的BDUSS"}`。
+- 该蜘蛛把分享链接解析成直链。官方接口需你的 cookie，模板里已留好位置，
+  也可直接填 `PARSE_API` 用第三方解析接口。
+
+> 没配网盘解析前，资源站里的网盘链接只会显示、点不开——这是正常的，
+> 配好 `netdisk_parser.js` 即恢复播放。
+
 ## 文件说明
 | 文件 | 作用 |
 |------|------|
@@ -73,6 +101,7 @@ python push_to_github.py
 | `crawler.py` | 爬虫，抓 MacCMS 源并严格过滤杜比，输出 catalog.json |
 | `spider.js` | TVBox drpy 蜘蛛，读取 catalog.json 当资源站 |
 | `subscribe.json` | TVBox 站点导入入口（type:3 + spider） |
+| `netdisk_parser.js` | 网盘解析蜘蛛模板（夸克/百度），播放侧需填你的 cookie/接口 |
 | `push_to_github.py` | 用 REST API 把 dolby/ 推到 GitHub |
 | `data/catalog.json` | 生成的杜比目录（MacCMS 兼容） |
 
