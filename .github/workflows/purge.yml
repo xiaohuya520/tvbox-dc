@@ -1,0 +1,28 @@
+name: Purge jsDelivr cache (daily)
+
+# 专门清 jsDelivr 缓存。jsDelivr 对 GitHub @main 分支有最长 12h 的 CDN 边缘缓存，
+# 且 cdn / fastly 等不同节点缓存不同步，常滞留旧版（用户手机拿到旧多仓入口 -> 子仓 jar 拉不到 -> 解析失败）。
+# 每天北京时间 01:00 主动清一次所有对外链接文件的缓存，保证用户随时拿到最新版。
+on:
+  schedule:
+    - cron: '0 17 * * *'        # UTC 17:00 = 北京时间次日 01:00
+  workflow_dispatch:            # 允许手动触发（改完配置立刻清一次）
+
+permissions:
+  contents: read
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Purge all public files
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          FILES="dc.json dc-me.json dc-self.json mybox-self.json mybox-sun-twin.json mybox-self-fast.json mybox-self-cdn.json mybox-pure.json sun_sites_cache.json source_sites.json jar/sun_spider.png"
+          for f in $FILES; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 25 "https://purge.jsdelivr.net/gh/${REPO}@main/$f")
+            echo "purge $f -> HTTP $code"
+          done
+          echo "done"
