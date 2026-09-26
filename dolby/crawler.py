@@ -535,15 +535,25 @@ def main():
         if not any_enabled:
             print("[warn] config.json 里没有 enabled 的源，未抓取任何数据。")
 
+    # MacCMS 兼容静态格式：带 class（type:0 静态站可用）+ 分页字段 + 全量 list
+    items = list(collected.values())
     catalog = {
         "updated": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "total": len(collected),
-        "list": list(collected.values()),
+        "class": [
+            {"type_id": "1", "type_name": "夸克网盘"},
+            {"type_id": "2", "type_name": "百度网盘"},
+            {"type_id": "3", "type_name": "全部"},
+        ],
+        "page": 1,
+        "pagecount": 1,
+        "limit": str(max(len(items), 1)),
+        "total": len(items),
+        "list": items,
     }
     os.makedirs(os.path.dirname(CATALOG_PATH), exist_ok=True)
     with open(CATALOG_PATH, "w", encoding="utf-8") as f:
         json.dump(catalog, f, ensure_ascii=False, indent=2)
-    print(f"[done] 共 {len(collected)} 条杜比资源 -> {CATALOG_PATH}")
+    print(f"[done] 共 {len(items)} 条杜比资源 -> {CATALOG_PATH}")
 
 
 if __name__ == "__main__":
