@@ -32,6 +32,15 @@ const SELF_JAR_URL = 'https://gh-proxy.com/https://raw.githubusercontent.com/xia
 // （配合 crawl.yml 每天自动 purge jsDelivr 缓存，保证手机端拿到的永远是最新版）
 const SELF_JAR_CDN_URL = 'https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/jar/sun_spider.png';
 
+// ===== C2. 功能增强：豆瓣首页 + 网盘配置中心 =====
+// 依据 FongMi 源码（SiteDialog/VodConfig/Site.java）验证的机制：
+//   「请选择首页数据源」弹窗 = 配置里全部未隐藏站点；默认首页 = sites 数组第一个站点
+//   → 把豆瓣站插到 sites[0] 即"默认首页=豆瓣"（sun jar 自带 csp_Douban 类，出热门电影/热播剧集/热门动漫等标签页）
+// 「配置·中心」「我的·网盘」（夸克/UC/百度/迅雷/天翼 Cookie 设置）是王二小 jar 专属类
+//   → 用站点级 jar 字段（FongMi Site 支持 per-site jar）引用王二小 jar，不影响全局 sun spider
+const WEX_CONFIG_URL = 'https://9280.kstore.vip/newwex.json'; // 王二小仓（每天跟随其更新 jar 地址）
+const WEX_JAR_FALLBACK = 'http://oss4liview.moji.com/thd_file/2026/09/24/06cf2230c30d9c26fa46ea79147b330d.jpg;md5;fc8f993c9297d38139363cd0e3db9853';
+
 // ===== A. 候选苹果CMS资源站（type:1，TVBox 原生抓取）=====
 // 这就是「源头站点」池：不依赖 sun，每天探测，活的自动进单仓
 const CANDIDATES = [
@@ -97,6 +106,23 @@ async function fetchSun() {
     return JSON.parse(text); // 明文 JSON
   } catch (e) {
     return JSON.parse(decryptTvbox(text)); // 加密配置
+  }
+}
+
+// 拉王二小仓，取它最新的 spider jar 地址（配置中心/我的网盘的 per-site jar 每天跟随更新）
+async function fetchWexJar() {
+  try {
+    const res = await fetchWithTimeout(WEX_CONFIG_URL, TIMEOUT);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const cfg = JSON.parse((await res.text()).trim());
+    if (cfg && typeof cfg.spider === 'string' && cfg.spider.includes(';md5;')) {
+      console.log(`  ✅ 王二小 jar 最新地址获取成功`);
+      return cfg.spider;
+    }
+    throw new Error('spider 字段异常');
+  } catch (e) {
+    console.log(`  ⚠️ 王二小 jar 获取失败（${e.message}），用内置兜底地址`);
+    return WEX_JAR_FALLBACK;
   }
 }
 
@@ -241,6 +267,27 @@ async function main() {
       console.log(`  ↩️ 沿用仓库已自托管的 jar（md5=${md5}），本次仅不更新 sun 站点`);
     }
   }
+
+  // ===== C2) 功能增强：豆瓣首页置顶 + 网盘配置中心 =====
+  // 豆瓣·首页插到 sites[0] → FongMi/影视仓默认首页=豆瓣（sun jar 自带 Douban 类）
+  sites.unshift({
+    key: 'csp_Douban', name: '豆瓣·首页', type: 3, api: 'csp_Douban',
+    searchable: 0, quickSearch: 0, changeable: 1, indexs: 1,
+  });
+  console.log('  ✅ 豆瓣·首页 置顶（默认首页=豆瓣，sun jar 内置 Douban 类）');
+  // 配置·中心 / 我的·网盘（夸克/UC/百度/迅雷/天翼 Cookie 设置）= 王二小 jar 专属类，per-site jar 引入
+  const wexJar = await fetchWexJar();
+  sites.push(
+    {
+      key: 'wex_panconfig', name: '配置·中心', type: 3, api: 'csp_PanConfigGuard', jar: wexJar,
+      searchable: 0, quickSearch: 0, changeable: 0, indexs: 0, style: { type: 'list' },
+    },
+    {
+      key: 'wex_mypan', name: '我的·网盘', type: 3, api: 'csp_MyPanGuard', jar: wexJar,
+      searchable: 0, quickSearch: 0, changeable: 0, indexs: 0, style: { type: 'list' },
+    },
+  );
+  console.log('  ✅ 配置·中心 / 我的·网盘 已加入（per-site jar = 王二小，夸克/UC/百度/迅雷 Cookie 设置）');
 
   const box = { spider, sites, lives: [], parses: [], flags: [], rules: {}, ...sunExtra };
   const out = path.join(__dirname, 'mybox-self.json');
