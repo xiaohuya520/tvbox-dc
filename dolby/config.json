@@ -24,7 +24,7 @@
   },
   "netdisk": {
     "enabled": true,
-    "require_netdisk": false,
+    "require_netdisk": true,
     "labels": {
       "夸克网盘": ["pan.quark.cn", "quark.cn"],
       "百度网盘": ["pan.baidu.com", "baidu.com"],
@@ -35,16 +35,34 @@
   },
   "sources": [
     {
-      "name": "Dolby官方杜比片单 + 综合站搜索",
-      "type": "dolby_list",
+      "name": "Telegram 公开原盘频道（夸克为主/百度为辅）",
+      "type": "tg_channel",
       "enabled": true,
+      "require_remux": true,
+      "require_dolby": true,
+      "max_pages": 6,
+      "delay": 1.0,
+      "channels": [
+        "dianying4K",
+        "MFFXQF",
+        "Oscar_4Kmovies",
+        "Aliyun_4K_Movies",
+        "Netdisk_Movies",
+        "Quark_Movies",
+        "vip115hot",
+        "XiangxiuNB"
+      ]
+    },
+    {
+      "name": "Dolby官方杜比片单 + 综合站搜索（在线m3u8兜底，非原盘）",
+      "type": "dolby_list",
+      "enabled": false,
       "list_url": "https://professional.dolby.com/zh-cn/cinema/theatrical-releases",
       "search_sources": [
         "http://cj.lziapi.com/api.php/provide/vod"
       ],
       "play_flag": "杜比电影",
       "min_year": 2023,
-      "max_movies": 40,
       "workers": 2
     },
     {
