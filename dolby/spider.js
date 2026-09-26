@@ -4,20 +4,52 @@
  * 读取 GitHub 上的 catalog.json（由 crawler.py 生成），把「全部杜比资源」
  * 作为一个 TVBox 资源站提供出来。
  *
- * 兼容性说明（针对“转圈加载”做的加固）：
- *  - 抓取函数自动兜底：优先 fetch()，没有则用 req()，再没有用 http.get()
+ * 加固说明：
+ *  - 多镜像兜底：ext 传多个 URL（JSON 数组）时逐个尝试，jsdelivr 挂了自动换 github.io
+ *  - 抓取函数自动兜底：优先 req()，没有则用 http.get()，再没有用 fetch()
+ *  - search 兼容各壳子签名 search(wd, quick, pg)，关键词自动 URL 解码，
+ *    同时匹配片名和备注，支持翻页
  *  - 所有函数 try/catch，绝不让异常挂死界面
- *  - 实现了 home/homeVod/category/detail/search/play 全套，兼容各壳子
  */
 
-var catalogUrl = '';
+var catalogUrls = [];
 var cache = null;
 var cacheTime = 0;
 var CACHE_MS = 5 * 60 * 1000;
 
+var FALLBACKS = [
+    'https://xiaohuya520.github.io/tvbox-dc/dolby/catalog.json',
+    'https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json',
+    'https://fastly.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json'
+];
+
 function init(ext) {
-    catalogUrl = ext || catalogUrl;
-    return catalogUrl;
+    catalogUrls = [];
+    if (ext) {
+        if (typeof ext === 'string') {
+            var s = ext.replace(/^\s+|\s+$/g, '');
+            if (s.charAt(0) === '{' || s.charAt(0) === '[') {
+                try {
+                    var o = JSON.parse(s);
+                    if (o.urls) { catalogUrls = o.urls; }
+                    else if (o.catalog) { catalogUrls = [o.catalog]; }
+                    else { catalogUrls = [s]; }
+                } catch (e) { catalogUrls = [s]; }
+            } else {
+                catalogUrls = [s];
+            }
+        } else if (ext.urls) {
+            catalogUrls = ext.urls;
+        } else if (ext.catalog) {
+            catalogUrls = [ext.catalog];
+        }
+    }
+    if (!catalogUrls.length) { catalogUrls = FALLBACKS; }
+    // 把配置的 URL 排前面，镜像兜底追加在后
+    for (var i = 0; i < FALLBACKS.length; i++) {
+        if (catalogUrls.indexOf(FALLBACKS[i]) < 0) { catalogUrls.push(FALLBACKS[i]); }
+    }
+    return JSON.stringify({ urls: catalogUrls });
 }
 
 function httpGet(url) {
@@ -40,13 +72,18 @@ function loadCatalog() {
     if (cache && (now - cacheTime) < CACHE_MS) {
         return cache;
     }
-    var txt = httpGet(catalogUrl);
-    var c = JSON.parse(txt);
-    if (c && c.list) {
-        cache = c;   // 只有抓成功才更新缓存，失败时下次重试
-        cacheTime = now;
+    for (var i = 0; i < catalogUrls.length; i++) {
+        try {
+            var txt = httpGet(catalogUrls[i]);
+            var c = JSON.parse(txt);
+            if (c && c.list && c.list.length) {
+                cache = c;   // 只有抓成功才更新缓存，失败时换下一个镜像
+                cacheTime = now;
+                return c;
+            }
+        } catch (e) { /* 换下一个镜像 */ }
     }
-    return c;
+    return cache; // 全部失败时用旧缓存
 }
 
 function getList() {
@@ -99,15 +136,36 @@ function category(tid, pg) {
     };
 }
 
-function search(wd, quick) {
-    var kw = (wd || '').toLowerCase();
-    var list = getList()
-        .filter(function (it) {
-            return (it.vod_name || '').toLowerCase().indexOf(kw) >= 0;
-        })
-        .slice(0, 30)
-        .map(mapItem);
-    return { list: list };
+function decodeKw(s) {
+    try {
+        if (s.indexOf('%') >= 0) {
+            return decodeURIComponent(s);
+        }
+    } catch (e) { /* 保持原样 */ }
+    return s;
+}
+
+function search(wd, quick, pg) {
+    pg = parseInt(pg || '1', 10);
+    var kw = decodeKw(String(wd || '')).toLowerCase().replace(/^\s+|\s+$/g, '');
+    var all = getList();
+    var hit = [];
+    for (var i = 0; i < all.length && hit.length < 200; i++) {
+        var it = all[i];
+        var name = String(it.vod_name || '').toLowerCase();
+        var remark = String(it.vod_remarks || '').toLowerCase();
+        if (kw === '' || name.indexOf(kw) >= 0 || remark.indexOf(kw) >= 0) {
+            hit.push(it);
+        }
+    }
+    var per = 30;
+    var start = (pg - 1) * per;
+    return {
+        list: hit.slice(start, start + per).map(mapItem),
+        page: pg,
+        pagecount: Math.max(1, Math.ceil(hit.length / per)),
+        total: hit.length
+    };
 }
 
 function detail(id) {
