@@ -1,0 +1,36 @@
+{
+  "updated": "2026-09-26T10:14:28",
+  "total": 3,
+  "list": [
+    {
+      "vod_id": "demo1",
+      "vod_name": "【演示】星际穿越 杜比视界版",
+      "vod_pic": "",
+      "vod_remarks": "杜比视界|4K|演示样例",
+      "vod_year": "2014",
+      "vod_content": "这是演示数据，请运行 python crawler.py 抓取真实杜比资源后覆盖。",
+      "vod_play_from": "杜比线路",
+      "vod_play_url": "第01集$https://example.com/demo1.m3u8#第02集$https://example.com/demo1b.m3u8"
+    },
+    {
+      "vod_id": "demo2",
+      "vod_name": "【演示】沙丘2 杜比全景声 4K原盘",
+      "vod_pic": "",
+      "vod_remarks": "杜比全景声|4K原盘|演示样例",
+      "vod_year": "2024",
+      "vod_content": "这是演示数据，请运行 python crawler.py 抓取真实杜比资源后覆盖。",
+      "vod_play_from": "杜比线路",
+      "vod_play_url": "正片$https://example.com/demo2.m3u8"
+    },
+    {
+      "vod_id": "demo3",
+      "vod_name": "【演示】奥本海默 杜比视界+全景声",
+      "vod_pic": "",
+      "vod_remarks": "杜比视界|杜比全景声|演示样例",
+      "vod_year": "2023",
+      "vod_content": "这是演示数据，请运行 python crawler.py 抓取真实杜比资源后覆盖。",
+      "vod_play_from": "杜比线路",
+      "vod_play_url": "正片$https://example.com/demo3.m3u8"
+    }
+  ]
+}
