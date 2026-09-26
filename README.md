@@ -4,7 +4,11 @@
 
 ## 直接导入链接
 
-**自己的爬虫单仓 mybox-self.json（纯 JS 爬虫探测在线苹果CMS资源站生成，完全自己可控、随时加站）** ← 本次主推
+**纯净直连版 mybox-pure.json（只有苹果CMS直连资源站，无 jar、无 sun 站点，任何壳子都能导入，解析永不失败）** ← 排障首选
+- 主推：`https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-pure.json`
+- 直连：`https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-pure.json`
+
+**自己的爬虫单仓 mybox-self.json（纯 JS 爬虫探测在线苹果CMS资源站生成，完全自己可控、随时加站）**
 - 主推（国内快）：`https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json`
 - 备用：`https://ghfast.top/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json`
 - 直连：`https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json`
