@@ -535,11 +535,19 @@ def main():
         if not any_enabled:
             print("[warn] config.json 里没有 enabled 的源，未抓取任何数据。")
 
-    # MacCMS 兼容静态格式：带 class（type:0 静态站可用）+ 分页字段 + 全量 list
+    # MacCMS 兼容静态格式：数字 vod_id + 分页字段 + class + 全量 list
+    # （部分壳子的 MacCMS 解析器按数字解析 vod_id，字符串 id 会导致"没找到数据"）
     items = list(collected.values())
+    now = time.strftime("%Y-%m-%d %H:%M:%S")
+    for i, it in enumerate(items, 1):
+        it["vod_id"] = i
+        it["vod_time"] = now
+        it["vod_hits"] = 0
+        it["vod_score"] = 0.0
+        it["vod_status"] = 1
     catalog = {
         "code": 1,
-        "msg": "",
+        "msg": "数据列表",
         "updated": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "class": [
             {"type_id": "1", "type_name": "夸克网盘"},
@@ -548,7 +556,7 @@ def main():
         ],
         "page": 1,
         "pagecount": 1,
-        "limit": str(max(len(items), 1)),
+        "limit": len(items),
         "total": len(items),
         "list": items,
     }
