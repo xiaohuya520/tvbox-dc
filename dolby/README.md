@@ -84,15 +84,21 @@ python push_to_github.py
 若你的杜比源全是 4K原盘网盘，`require_netdisk: true` 最干净。
 
 **② 播放侧（需你的网盘凭据）**
-网盘分享链接不能直接播，要在 TVBox 里配「网盘解析」。本仓库给了模板
-`netdisk_parser.js`（drpy 蜘蛛）：
+网盘分享链接不能直接播，要在 TVBox 里配「网盘解析」。本仓库给了
+`netdisk_parser.js`（drpy 蜘蛛，已实装解析逻辑）：
 - 在 TVBox 添加两个「网盘」站点，key 分别填 `夸克网盘`、`百度网盘`，
-  `api` 都指向 `netdisk_parser.js`，`ext` 填 `{"quark":"你的夸克cookie","baidu":"你的BDUSS"}`。
-- 该蜘蛛把分享链接解析成直链。官方接口需你的 cookie，模板里已留好位置，
-  也可直接填 `PARSE_API` 用第三方解析接口。
+  `api` 都指向 `netdisk_parser.js`，`ext` 填
+  `{"quark":"你的夸克ck","baidu":"你的BDUSS","parseApi":"可选百度解析接口"}`。
+  （cookie 也可直接写死在 `netdisk_parser.js` 顶部的 `QUARK_COOKIE`/`BAIDU_BDUSS` 常量里。）
+- **夸克**：纯 cookie 走官方分享接口即可拿到在线播放直链，已实装可用。
+- **百度**：分享下载带签名校验，纯 cookie 在客户端蜘蛛里较脆。已实装接口骨架，
+  但需你确认 `BAIDU_SIGN_KEY`（签名密钥，随版本变）；最稳的做法是给百度填
+  `PARSE_API`（第三方解析接口），留空 `BAIDU_SIGN_KEY` 时百度自动走 `PARSE_API`。
+  只想用夸克、百度暂不解析：留空百度相关即可。
 
 > 没配网盘解析前，资源站里的网盘链接只会显示、点不开——这是正常的，
-> 配好 `netdisk_parser.js` 即恢复播放。
+> 配好 `netdisk_parser.js`（填你的 cookie 或解析接口）即恢复播放。
+> 注意：cookie/BDUSS 是敏感凭据，**不要在聊天里发给我**，本地填文件或 TVBox ext 即可。
 
 ## 文件说明
 | 文件 | 作用 |
