@@ -150,6 +150,7 @@ async function main() {
   let spider = '';
   let sunCount = 0;
   let sunSpiderRaw = ''; // sun 原始 spider（国内图床 URL，每天跟随 sun 更新）
+  let sunExtra = {}; // sun 的额外顶层字段（壁纸/logo/弹幕/doh/广告/直播/解析等），保证结构与 sun 完全一致
   const sourceLog = []; // 源头站点探测日志（写进 source_sites.json 给人看）
 
   // A) 探测苹果CMS资源站
@@ -177,11 +178,15 @@ async function main() {
     sites.push(...all);
     sunCount = all.length;
     sunSpiderRaw = sun.spider || ''; // sun 自己的 spider（国内图床，"快版"用）
+    // 复制 sun 的额外顶层字段，使生成的单仓结构与 sun 逐字段对齐（壳子兼容性最佳）
+    for (const k of ['wallpaper', 'logo', 'danmaku', 'doh', 'ads', 'lives', 'parses', 'rules', 'flags']) {
+      if (sun[k] !== undefined) sunExtra[k] = sun[k];
+    }
     // 刷新缓存：把解密后的 sun 站点存进仓库。sun 哪天挂了/消失，下次构建用它兜底
     try {
       fs.writeFileSync(
         path.join(__dirname, 'sun_sites_cache.json'),
-        JSON.stringify({ updated: new Date().toISOString(), count: all.length, spider: sunSpiderRaw, sites: all }, null, 2),
+        JSON.stringify({ updated: new Date().toISOString(), count: all.length, spider: sunSpiderRaw, extra: sunExtra, sites: all }, null, 2),
         'utf-8'
       );
       console.log(`  ✅ 并入 sun 全部站点 ${all.length} 个（已刷新缓存 sun_sites_cache.json）`);
@@ -222,6 +227,7 @@ async function main() {
         sites.push(...cs);
         sunCount = cs.length;
         sunSpiderRaw = cached.spider || '';
+        sunExtra = cached.extra || {};
         console.log(`  ↩️ 使用缓存的 sun 站点 ${cs.length} 个（缓存于 ${cached.updated || '未知时间'}）`);
       } catch (pe) {
         console.log(`  ⚠️ 缓存读取失败: ${pe.message}`);
@@ -236,7 +242,7 @@ async function main() {
     }
   }
 
-  const box = { spider, sites, lives: [], parses: [], flags: [], rules: {} };
+  const box = { spider, sites, lives: [], parses: [], flags: [], rules: {}, ...sunExtra };
   const out = path.join(__dirname, 'mybox-self.json');
   fs.writeFileSync(out, JSON.stringify(box, null, 2), 'utf-8');
   console.log(`\n[完成] 资源站 ${sites.length - sunCount} + sun站 ${sunCount} = 共 ${sites.length} 个，spider ${spider ? '自托管OK' : '空'}，已写入 ${out}`);
@@ -265,6 +271,14 @@ async function main() {
     'utf-8'
   );
   console.log(`[快版] mybox-self-fast.json 已写入（spider 指 sun 国内图床: ${sunSpiderRaw.split(';')[0] || '无'}）`);
+
+  // 完整版（= 快版，已含 sun 全部顶层字段），单独命名供"直导"使用，每天自动跟随 sun 更新
+  fs.writeFileSync(
+    path.join(__dirname, 'mybox-sun-twin.json'),
+    JSON.stringify(boxFast, null, 2),
+    'utf-8'
+  );
+  console.log(`[完整版] mybox-sun-twin.json 已写入（结构对齐 sun，spider 走 sun 图床，可直导）`);
 
   // D) 纯净版单仓：只有 type:1 直连资源站，无 jar、无 type:3，任何壳子都能导入
   const pureSites = sites.filter((s) => s.type === 1);
