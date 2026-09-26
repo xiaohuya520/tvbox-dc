@@ -25,7 +25,8 @@ const UA = 'okhttp/3.15';
 const TIMEOUT = 9000;
 
 // 自托管 jar 的对外地址（导入后的单仓只认这个，不再认 sun 的动态地址）
-const SELF_JAR_URL = 'https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/jar/sun_spider.jar';
+// 实测（2026-09-26 用户宽带）：raw 超时、jsDelivr 拒载 jar(403)、gh-proxy 1秒拉完 1.8MB → 用 gh-proxy
+const SELF_JAR_URL = 'https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/jar/sun_spider.jar';
 
 // ===== A. 候选苹果CMS资源站（type:1，TVBox 原生抓取）=====
 const CANDIDATES = [
