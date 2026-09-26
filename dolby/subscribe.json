@@ -1,8 +1,18 @@
 {
   "sites": [
     {
-      "key": "SelfDolby",
+      "key": "SelfDolby0",
       "name": "我的杜比资源站",
+      "type": 0,
+      "api": "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json",
+      "searchable": 1,
+      "quickSearch": 1,
+      "filterable": 1,
+      "playable": 1
+    },
+    {
+      "key": "SelfDolby3",
+      "name": "我的杜比资源站(蜘蛛)",
       "type": 3,
       "api": "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/spider.js",
       "ext": "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json",
