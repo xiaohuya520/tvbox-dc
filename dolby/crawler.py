@@ -147,6 +147,152 @@ def fetch_dolby_official(url):
     return DOLBY_SNAPSHOT
 
 
+def fetch_html(url, timeout=20, ua="Mozilla/5.0"):
+    """抓取网页 HTML（用于 Telegram 公开频道页）。"""
+    req = urllib.request.Request(url, headers={"User-Agent": ua, "Referer": url})
+    with urllib.request.urlopen(req, timeout=timeout, context=CTX) as r:
+        return r.read().decode("utf-8", "ignore")
+
+
+QUARK_RE = re.compile(r"https?://pan\.quark\.cn/s/[A-Za-z0-9_\-]+", re.I)
+BAIDU_RE = re.compile(
+    r"https?://pan\.baidu\.com/s/[A-Za-z0-9_\-]+(?:\?pwd=[A-Za-z0-9_\-]+)?", re.I)
+POST_RE = re.compile(r'data-post="(?:[^"]*/)?(\d+)"')
+MSG_TEXT_RE = re.compile(
+    r'class="tgme_widget_message_text[^"]*"[^>]*>(.*?)</div>', re.S)
+
+
+def parse_tg_html(html):
+    """解析 t.me/s/频道页，返回帖子列表。
+    每个帖子: {post_id, title, text, quark:[...], baidu:[...]}。"""
+    blocks = re.split(r'data-post="', html)
+    out = []
+    for b in blocks[1:]:
+        m = re.match(r'(?:[^"]*/)?(\d+)', b)
+        if not m:
+            continue
+        pid = m.group(1)
+        text_m = MSG_TEXT_RE.search(b)
+        text = ""
+        if text_m:
+            text = re.sub(r"<[^>]+>", "", text_m.group(1))
+            text = text.replace("&amp;", "&").replace("&lt;", "<")
+            text = text.replace("&gt;", ">").replace("&quot;", '"').strip()
+        if not text:
+            continue
+        quark = QUARK_RE.findall(b)
+        baidu = BAIDU_RE.findall(b)
+        # 标题：优先“名称:”后内容，否则取首行
+        name_m = re.search(r"名称[:：]\s*(.+)", text)
+        if name_m:
+            title = name_m.group(1).split("\n")[0].strip()
+        else:
+            title = text.split("\n")[0].strip()
+        title = re.split(r"[（(]?\s*描述", title)[0].strip()
+        out.append({"post_id": pid, "title": title, "text": text,
+                    "quark": quark, "baidu": baidu})
+    return out
+
+
+def _has_remux(text):
+    # 强原盘标记，避免把“无原盘”之类否定句误判
+    return bool(re.search(r"原盘|REMUX|UHD", text, re.I))
+
+
+def _has_dolby(text):
+    # 仅认明确正向标记，避开“无杜比”之类的否定
+    return bool(re.search(
+        r"杜比视界|杜比全景声|Dolby\s*Vision|Dolby\s*Atmos|杜比\s*ATMOS",
+        text, re.I))
+
+
+def _clean_tg_title(t):
+    t = re.sub(r"https?://\S+", "", t)  # 去链接
+    t = re.sub(r"(夸克|百度|阿里|迅雷|115|天翼|光鸭)[::：]\s*", "", t)
+    t = re.sub(r"\s+", " ", t).strip()
+    return t
+
+
+def crawl_tg_channel(src, crawl_cfg, netdisk_cfg, dolby_cfg, collected):
+    """抓取公开 Telegram 频道（t.me/s/频道名）里的 4K原盘/杜比资源，
+    解析出夸克/百度网盘分享链接。夸克为主、百度为辅。
+    注意：本机运行效果最佳（沙箱网络可能无法直连 t.me）。"""
+    channels = src.get("channels", [])
+    ua = crawl_cfg.get("user_agent", "Mozilla/5.0")
+    timeout = min(int(crawl_cfg.get("timeout", 20)), 15)
+    max_pages = int(src.get("max_pages", 6))
+    require_netdisk = bool(netdisk_cfg.get("require_netdisk", True)) \
+        if netdisk_cfg else True
+    require_remux = bool(src.get("require_remux", True))
+    require_dolby = bool(src.get("require_dolby", True))
+    delay = float(src.get("delay", 1.0))
+
+    for ch in channels:
+        print(f"  [tg] 频道 @{ch}")
+        before = 0
+        seen = 0
+        for pg in range(max_pages):
+            url = "https://t.me/s/%s" % ch + \
+                (("?before=%s" % before) if before else "")
+            try:
+                html = fetch_html(url, timeout, ua)
+            except Exception as e:
+                print(f"    [warn] 翻页失败: {e}")
+                break
+            posts = parse_tg_html(html)
+            if not posts:
+                break
+            for p in posts:
+                text = p["text"]
+                if require_remux and not _has_remux(text):
+                    continue
+                if require_dolby and not _has_dolby(text):
+                    continue
+                quark = p["quark"]
+                baidu = p["baidu"]
+                # 夸克为主、百度为辅
+                chosen = []
+                if quark:
+                    chosen += [("夸克网盘", l) for l in quark]
+                if baidu:
+                    chosen += [("百度网盘", l) for l in baidu]
+                if require_netdisk and not chosen:
+                    continue
+                if not chosen:
+                    continue
+                title = _clean_tg_title(p["title"]) or ("post_%s" % p["post_id"])
+                vid = "tg_%s_%s" % (ch, re.sub(r"\W+", "", title)[:40])
+                if vid in collected:
+                    continue
+                play_from = "$$$".join(label for label, _ in chosen)
+                play_url = "#".join("正片$%s" % u for _, u in chosen)
+                tags = []
+                if _has_dolby(text):
+                    tags += ["杜比视界", "杜比全景声"]
+                if _has_remux(text):
+                    tags.append("4K原盘")
+                collected[vid] = {
+                    "vod_id": vid,
+                    "vod_name": title,
+                    "vod_pic": "",
+                    "vod_remarks": "|".join(tags) + "|" +
+                    "|".join(label for label, _ in chosen),
+                    "vod_year": "",
+                    "vod_content": "来源 Telegram @%s（4K原盘/杜比，夸克为主百度为辅）" % ch,
+                    "vod_play_from": play_from,
+                    "vod_play_url": play_url,
+                    "vod_netdisk": "$$$".join(label for label, _ in chosen),
+                }
+                seen += 1
+                print(f"  [+{seen}] @{ch} {title}  [{play_from}]")
+            ids = [int(p["post_id"]) for p in posts]
+            nxt = min(ids) if ids else 0
+            if nxt == before or not ids:
+                break
+            before = nxt
+            time.sleep(delay)
+
+
 def _clean_title(name):
     """清洗片名，去掉常见噪音后缀便于搜索匹配。"""
     n = name.strip()
@@ -382,6 +528,8 @@ def main():
             print(f"[info] 开始抓取({stype}): {src['name']}")
             if stype == "dolby_list":
                 crawl_dolby_list(src, crawl_cfg, config.get("netdisk", {}), collected)
+            elif stype == "tg_channel":
+                crawl_tg_channel(src, crawl_cfg, config.get("netdisk", {}), dolby_cfg, collected)
             else:
                 crawl_source(src, crawl_cfg, dolby_cfg, config.get("netdisk", {}), collected)
         if not any_enabled:
