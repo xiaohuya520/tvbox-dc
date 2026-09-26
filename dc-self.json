@@ -1,0 +1,30 @@
+{
+  "stores": [
+    {
+      "name": "我的资源站(gh-proxy)",
+      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json"
+    },
+    {
+      "name": "我的资源站(fastly)",
+      "url": "https://fastly.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-self.json"
+    },
+    {
+      "name": "我的资源站(raw)",
+      "url": "https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json"
+    }
+  ],
+  "urls": [
+    {
+      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json",
+      "name": "我的资源站(gh-proxy)"
+    },
+    {
+      "url": "https://fastly.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-self.json",
+      "name": "我的资源站(fastly)"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json",
+      "name": "我的资源站(raw)"
+    }
+  ]
+}
