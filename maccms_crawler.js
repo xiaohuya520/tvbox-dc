@@ -30,6 +30,7 @@ const TIMEOUT = 9000;
 const SELF_JAR_URL = 'https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/jar/sun_spider.jar';
 
 // ===== A. 候选苹果CMS资源站（type:1，TVBox 原生抓取）=====
+// 这就是「源头站点」池：不依赖 sun，每天探测，活的自动进单仓
 const CANDIDATES = [
   { key: 'hongniu',  name: '红牛资源',   api: 'https://hongniuzy2.com/api.php/provide/vod' },
   { key: 'liangzi',  name: '量子资源',   api: 'https://cj.lziapi.com/api.php/provide/vod' },
@@ -41,6 +42,26 @@ const CANDIDATES = [
   { key: 'yutu',     name: '鱼兔资源',   api: 'https://apiyutu.com/api.php/provide/vod' },
   { key: 'aosika',   name: '奥斯卡资源', api: 'https://aosikazy.com/api.php/provide/vod' },
   { key: 'shandian', name: '闪电资源',   api: 'http://sdzyapi.com/api.php/provide/vod' },
+  { key: 'baofeng',  name: '暴风资源',   api: 'https://bfzyapi.com/api.php/provide/vod' },
+  { key: 'tianya',   name: '天涯资源',   api: 'https://tyyszy.com/api.php/provide/vod' },
+  { key: 'maotai',   name: '茅台资源',   api: 'https://caiji.maotaizy.cc/api.php/provide/vod' },
+  { key: 'yinghua',  name: '樱花资源',   api: 'https://m3u8.apiyhzy.com/api.php/provide/vod' },
+  { key: 'feifan',   name: '非凡资源',   api: 'https://ffzy5.tv/api.php/provide/vod' },
+  { key: 'wujin',    name: '无尽资源',   api: 'https://api.wuxinews.net/api.php/provide/vod' },
+  { key: 'youzhi',   name: '优质资源',   api: 'http://www.ypczp.com/api.php/provide/vod' },
+  { key: 'hualu',    name: '华录资源',   api: 'https://huoluzy.com/api.php/provide/vod' },
+  { key: 'subo',     name: '速播资源',   api: 'https://cw.cybdxy.com/api.php/provide/vod' },
+  { key: 'hongguo',  name: '红果资源',   api: 'https://hongniuzuoye.com/api.php/provide/vod' },
+  { key: 'lingzhu',  name: '领主资源',   api: 'https://lzzytv.com/api.php/provide/vod' },
+  { key: 'wangwang', name: '旺旺资源',   api: 'https://wwzy.tv/api.php/provide/vod' },
+  { key: 'baicai',   name: '白菜资源',   api: 'https://baicaizy.net/api.php/provide/vod' },
+  { key: 'haibo',    name: '海博资源',   api: 'https://haibozy.com/api.php/provide/vod' },
+  { key: 'jisu',     name: '极速资源',   api: 'https://jszyapi.com/api.php/provide/vod' },
+  { key: 'duozi',    name: '豆子资源',   api: 'https://duozt.com/api.php/provide/vod' },
+  { key: 'taohua',   name: '淘片资源',   api: 'https://taohuazy.net/api.php/provide/vod' },
+  { key: 'mojiang',  name: '墨江资源',   api: 'https://mojiangzy.com/api.php/provide/vod' },
+  { key: 'xiaguang', name: '夏光资源',   api: 'https://xgzy.cc/api.php/provide/vod' },
+  { key: 'kuaiche',  name: '快车资源',   api: 'https://caiji.kuaichezy.org/api.php/provide/vod' },
 ];
 
 // ===== B. sun.json（构建时数据源，运行时不依赖）=====
@@ -125,6 +146,7 @@ async function main() {
   const sites = [];
   let spider = '';
   let sunCount = 0;
+  const sourceLog = []; // 源头站点探测日志（写进 source_sites.json 给人看）
 
   // A) 探测苹果CMS资源站
   console.log(`[爬虫A] 开始探测 ${CANDIDATES.length} 个候选资源站...`);
@@ -136,8 +158,10 @@ async function main() {
         playUrl: '', ext: '', searchable: 1, quickSearch: 1, filterable: 1,
       });
       console.log(`  ✅ ${c.name}  在线 (${r.count})`);
+      sourceLog.push({ name: c.name, api: c.api, ok: true, count: r.count });
     } else {
       console.log(`  ❌ ${c.name}  离线/失败: ${r.reason}`);
+      sourceLog.push({ name: c.name, api: c.api, ok: false, reason: r.reason });
     }
   }
 
@@ -208,6 +232,24 @@ async function main() {
   const out = path.join(__dirname, 'mybox-self.json');
   fs.writeFileSync(out, JSON.stringify(box, null, 2), 'utf-8');
   console.log(`\n[完成] 资源站 ${sites.length - sunCount} + sun站 ${sunCount} = 共 ${sites.length} 个，spider ${spider ? '自托管OK' : '空'}，已写入 ${out}`);
+
+  // D) 纯净版单仓：只有 type:1 直连资源站，无 jar、无 type:3，任何壳子都能导入
+  const pureSites = sites.filter((s) => s.type === 1);
+  fs.writeFileSync(
+    path.join(__dirname, 'mybox-pure.json'),
+    JSON.stringify({ sites: pureSites, lives: [], parses: [] }, null, 2),
+    'utf-8'
+  );
+  console.log(`[纯净版] mybox-pure.json 写入直连资源站 ${pureSites.length} 个（无 jar 依赖，解析永不失败）`);
+
+  // E) 源头站点清单：全部候选站的名称+API+今日状态，sun 挂没挂都能直接拿源头
+  fs.writeFileSync(
+    path.join(__dirname, 'source_sites.json'),
+    JSON.stringify({ updated: new Date().toISOString(), total: CANDIDATES.length, results: sourceLog }, null, 2),
+    'utf-8'
+  );
+  const okN = sourceLog.filter((x) => x.ok).length;
+  console.log(`[源头清单] source_sites.json 已写入：${okN}/${CANDIDATES.length} 在线`);
 }
 
 main().catch((e) => { console.error('FATAL', e); process.exit(1); });
