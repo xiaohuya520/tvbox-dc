@@ -15,6 +15,10 @@
  *     "playable": 1
  *   }
  * TVBox 会把 ext 作为 catalog 地址传给 init()。
+ *
+ * 网盘支持: crawler 会把夸克/百度等网盘分享链接识别出来，并把 vod_play_from
+ * 标记为「夸克网盘/百度网盘」。本蜘蛛原样透传这些链接；真正把分享链接解析成
+ * 可播直链，需要在 TVBox 里单独配置「网盘解析」（见 netdisk_parser.js 模板）。
  */
 
 var catalogUrl = '';
