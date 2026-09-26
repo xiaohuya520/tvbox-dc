@@ -6,6 +6,9 @@
 
 ## 成品链接（推送后可用）
 
+**主站点（type:0 MacCMS 静态接口，无需蜘蛛/jar，任何壳子都认）**：
+`catalog.json` 已是 MacCMS 完整格式（class + list 全量含播放地址），订阅里 type:0 站点直接把它当 API 用。
+
 - 订阅导入：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/subscribe.json`
 - 目录数据：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json`
 - 蜘蛛脚本：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/spider.js`
