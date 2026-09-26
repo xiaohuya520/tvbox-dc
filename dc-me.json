@@ -1,0 +1,30 @@
+{
+  "stores": [
+    {
+      "name": "纯净直连版(无jar·最稳)",
+      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-pure.json"
+    },
+    {
+      "name": "我的资源站(主·gh-proxy)",
+      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json"
+    },
+    {
+      "name": "我的资源站(备·ghfast)",
+      "url": "https://ghfast.top/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json"
+    }
+  ],
+  "urls": [
+    {
+      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-pure.json",
+      "name": "纯净直连版(无jar·最稳)"
+    },
+    {
+      "url": "https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json",
+      "name": "我的资源站(主·gh-proxy)"
+    },
+    {
+      "url": "https://ghfast.top/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json",
+      "name": "我的资源站(备·ghfast)"
+    }
+  ]
+}
