@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-26T10:14:28",
-  "total": 3,
+  "updated": "2026-09-26T11:53:22",
+  "total": 5,
   "list": [
     {
       "vod_id": "demo1",
@@ -31,6 +31,28 @@
       "vod_content": "这是演示数据，请运行 python crawler.py 抓取真实杜比资源后覆盖。",
       "vod_play_from": "杜比线路",
       "vod_play_url": "正片$https://example.com/demo3.m3u8"
+    },
+    {
+      "vod_id": "demo4",
+      "vod_name": "【演示】阿凡达2 杜比视界 4K原盘",
+      "vod_pic": "",
+      "vod_remarks": "杜比视界|4K原盘|夸克网盘",
+      "vod_year": "2022",
+      "vod_content": "这是演示数据（网盘示例），请运行 python crawler.py 抓取真实杜比资源后覆盖。",
+      "vod_play_from": "夸克网盘",
+      "vod_play_url": "正片$https://pan.quark.cn/s/demo-avatars",
+      "vod_netdisk": "夸克网盘"
+    },
+    {
+      "vod_id": "demo5",
+      "vod_name": "【演示】流浪地球2 杜比全景声 4K原盘",
+      "vod_pic": "",
+      "vod_remarks": "杜比全景声|4K原盘|百度网盘",
+      "vod_year": "2023",
+      "vod_content": "这是演示数据（网盘示例），请运行 python crawler.py 抓取真实杜比资源后覆盖。",
+      "vod_play_from": "百度网盘",
+      "vod_play_url": "正片$https://pan.baidu.com/s/1demo-earth",
+      "vod_netdisk": "百度网盘"
     }
   ]
 }
