@@ -5,8 +5,11 @@
 ## 直接导入链接
 
 **自己的爬虫单仓 mybox-self.json（纯 JS 爬虫探测在线苹果CMS资源站生成，完全自己可控、随时加站）** ← 本次主推
-- `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json`
-- 国内镜像：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-self.json`
+- 主推（国内快）：`https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json`
+- 备用：`https://ghfast.top/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json`
+- 直连：`https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json`
+- ⚠️ 不要用 jsDelivr 镜像导入本文件：jsDelivr 缓存长达 12 小时，会拿到旧版（缺 spider、缺 sun 站点），表现为「解析配置失败」
+- 防失联：`sun_sites_cache.json` 是 sun 源的解密站点快照，sun 挂了爬虫自动用它兜底，单仓每天照常完整重建
 
 **自己的单仓 mybox.json（聚合所有好源的站点，导入即出全部站点，不用选仓库，加载最快）**
 - `https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox.json`
