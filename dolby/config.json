@@ -35,11 +35,24 @@
   },
   "sources": [
     {
-      "name": "示例杜比站A（替换为你的真实源）",
+      "name": "Dolby官方杜比片单 + 综合站搜索",
+      "type": "dolby_list",
+      "enabled": true,
+      "list_url": "https://professional.dolby.com/zh-cn/cinema/theatrical-releases",
+      "search_sources": [
+        "http://cj.lziapi.com/api.php/provide/vod"
+      ],
+      "play_flag": "杜比电影",
+      "min_year": 2023,
+      "max_movies": 40,
+      "workers": 2
+    },
+    {
+      "name": "示例MacCMS原盘站（换成真实杜比原盘/4K站后改enabled:true）",
       "type": "maccms",
       "api": "https://example-dolby-site.com/api.php/provide/vod",
       "enabled": false,
-      "play_flag": "杜比线路"
+      "play_flag": "杜比原盘"
     }
   ]
 }
