@@ -1,18 +1,19 @@
 {
   "sites": [
     {
-      "key": "SelfDolby0",
-      "name": "我的杜比资源站",
+      "key": "DolbyHome26",
+      "name": "我的杜比资源站(原生搜索)",
       "type": 0,
       "api": "https://xiaohuya520.github.io/tvbox-dc/dolby/catalog.json",
       "searchable": 1,
       "quickSearch": 1,
       "filterable": 1,
-      "playable": 1
+      "playable": 1,
+      "timeout": 15
     },
     {
-      "key": "SelfDolby3",
-      "name": "杜比·精确搜索(JS蜘蛛·部分壳子可用)",
+      "key": "DolbySpider26",
+      "name": "我的杜比资源站(蜘蛛精确搜索)",
       "type": 3,
       "api": "https://xiaohuya520.github.io/tvbox-dc/dolby/spider.js",
       "ext": {
