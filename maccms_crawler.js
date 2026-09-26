@@ -276,8 +276,10 @@ async function main() {
   });
   console.log('  ✅ 豆瓣·首页 置顶（默认首页=豆瓣，sun jar 内置 Douban 类）');
   // 配置·中心 / 我的·网盘（夸克/UC/百度/迅雷/天翼 Cookie 设置）= 王二小 jar 专属类，per-site jar 引入
+  // 位置：紧跟豆瓣·首页之后（第2、3位），用户要求配置中心靠前方便入口
   const wexJar = await fetchWexJar();
-  sites.push(
+  sites.splice(
+    1, 0,
     {
       key: 'wex_panconfig', name: '配置·中心', type: 3, api: 'csp_PanConfigGuard', jar: wexJar,
       searchable: 0, quickSearch: 0, changeable: 0, indexs: 0, style: { type: 'list' },
@@ -287,7 +289,7 @@ async function main() {
       searchable: 0, quickSearch: 0, changeable: 0, indexs: 0, style: { type: 'list' },
     },
   );
-  console.log('  ✅ 配置·中心 / 我的·网盘 已加入（per-site jar = 王二小，夸克/UC/百度/迅雷 Cookie 设置）');
+  console.log('  ✅ 配置·中心(第2位) / 我的·网盘(第3位) 已加入（per-site jar = 王二小）');
 
   const box = { spider, sites, lives: [], parses: [], flags: [], rules: {}, ...sunExtra };
   const out = path.join(__dirname, 'mybox-self.json');
