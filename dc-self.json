@@ -1,38 +1,38 @@
 {
   "stores": [
     {
-      "name": "我的资源站100+(手机·jsDelivr)",
+      "name": "我的资源站(快·sun图床)推荐",
+      "url": "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-self-fast.json"
+    },
+    {
+      "name": "我的资源站(稳·自托管)",
       "url": "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-self-cdn.json"
     },
     {
-      "name": "纯净直连版(手机·jsDelivr)",
+      "name": "纯净直连版(无jar)",
       "url": "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-pure.json"
     },
     {
       "name": "我的资源站(宽带·gh-proxy)",
       "url": "https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json"
-    },
-    {
-      "name": "我的资源站(备·ghfast)",
-      "url": "https://ghfast.top/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json"
     }
   ],
   "urls": [
     {
+      "url": "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-self-fast.json",
+      "name": "我的资源站(快·sun图床)推荐"
+    },
+    {
       "url": "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-self-cdn.json",
-      "name": "我的资源站100+(手机·jsDelivr)"
+      "name": "我的资源站(稳·自托管)"
     },
     {
       "url": "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/mybox-pure.json",
-      "name": "纯净直连版(手机·jsDelivr)"
+      "name": "纯净直连版(无jar)"
     },
     {
       "url": "https://gh-proxy.com/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json",
       "name": "我的资源站(宽带·gh-proxy)"
-    },
-    {
-      "url": "https://ghfast.top/https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/mybox-self.json",
-      "name": "我的资源站(备·ghfast)"
     }
   ]
 }
