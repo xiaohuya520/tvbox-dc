@@ -10,8 +10,23 @@
 - 目录数据：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json`
 - 蜘蛛脚本：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/spider.js`
 
-> 用 jsdelivr 镜像（国内直连稳）。原始地址把 `cdn.jsdelivr.net/gh/` 换成
-> `raw.githubusercontent.com/` 即可。
+**备选订阅链接（jsdelivr 转圈时换这些）**：
+- GitHub Pages（推荐，国内一般可达）：
+  `https://xiaohuya520.github.io/tvbox-dc/dolby/subscribe.json`
+- fastly 镜像：`https://fastly.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/subscribe.json`
+- testingcf 镜像：`https://testingcf.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/subscribe.json`
+- 原始地址：`https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/dolby/subscribe.json`
+
+## 转圈/加载失败排查（按顺序试）
+
+1. **换订阅链接**：`cdn.jsdelivr.net` 在国内常被 DNS 污染，先换成上面 GitHub Pages 的链接。
+2. **确认能上网打开**：手机/电视浏览器直接访问 `.../dolby/subscribe.json`，
+   能看到 JSON 文字才说明网络通。
+3. **看卡在哪一层**：
+   - 配置都加载不出来（界面空白）→ 订阅链接被墙，换链接；
+   - 能看到「我的杜比资源站」但点进去转圈 → 蜘蛛抓不到 catalog，同样换链接后重进；
+   - 能看到影片列表但点播放转圈 → 正常，网盘链接需要配好 `netdisk_parser.js` 的 cookie 才能播。
+4. **清缓存重进**：TVBox 设置里「清除缓存」后重新拉订阅。
 
 ## 工作流程
 
