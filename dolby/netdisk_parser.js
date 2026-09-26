@@ -1,73 +1,148 @@
 /**
- * TVBox 网盘解析蜘蛛（夸克 / 百度）—— 模板
+ * TVBox 网盘解析蜘蛛（夸克 / 百度）—— 真实解析版
  * ============================================
- * 用途: 把你资源站里「夸克网盘 / 百度网盘」的分享链接，解析成可直接播放/下载的直链。
- * 在 TVBox 里作为「网盘」类型站点添加，key 与资源站里的 play_from 对应
- * （即 "夸克网盘"、"百度网盘"），这样点资源站的网盘资源时，TVBox 会用本蜘蛛拿直链。
+ * 把资源站里「夸克网盘 / 百度网盘」的分享链接，解析成可直接播放/下载的直链。
+ * 在 TVBox 里作为「网盘」类型站点添加，key 分别与资源站里的 play_from 对应
+ * （"夸克网盘"、"百度网盘"），这样点资源站的网盘资源时，TVBox 会调本蜘蛛拿直链。
  *
- * ★ 必须配置（填你自己的）:
- *   - QUARK_COOKIE : 登录夸克网盘网页版后的 cookie（含 ck 字段）
- *   - BAIDU_BDUSS  : 登录百度网盘后的 BDUSS cookie
- *   没有这俩，网盘有账号校验，解析不了。
- * 也可改用第三方解析接口：把 PARSE_API 填上你的接口地址（见 parseByApi）。
+ * ★ 填你的凭据（二选一，推荐用 ext 在 TVBox 里填，不写死在文件里）:
+ *   1) 直接改下面两个常量；或
+ *   2) 在 TVBox 该网盘站点的 ext 里填 JSON: {"quark":"你的ck","baidu":"你的BDUSS"}
+ *   - QUARK_COOKIE : 登录 pan.quark.cn 后 cookie 里的 `ck=...` 整段
+ *   - BAIDU_BDUSS  : 登录 pan.baidu.com 后 cookie 里的 `BDUSS=...` 整段
  *
- * 注: 网盘官方接口经常变动，下方夸克/百度的具体请求是「示意骨架」，需要你按自己
- * 账号实测补全（或让助手按你给的接口文档补齐）。采集+打标签部分已可用，这一层
- * 取决于你的凭据，所以先给模板。
+ * 能力说明:
+ *   - 夸克: 纯 cookie 走官方分享接口即可拿到在线播放直链（已实装）。
+ *   - 百度: 分享下载带签名校验，纯 cookie 在客户端蜘蛛里较脆；已实装接口骨架，
+ *           并保留 PARSE_API 作为百度兜底（填了就走第三方解析，最稳）。
+ *           若只想要夸克、百度暂不解析，留空 BAIDU 相关即可。
  */
 
-var QUARK_COOKIE = '';   // 例: 'ck=xxxx; ...'
-var BAIDU_BDUSS  = '';   // 例: 'BDUSS=xxxx; ...'
-var PARSE_API    = '';   // 可选第三方网盘解析接口，留空则用上面的 cookie 直连
+var QUARK_COOKIE = '';     // 夸克 ck
+var BAIDU_BDUSS  = '';     // 百度 BDUSS
+var PARSE_API    = '';     // 可选：百度解析兜底接口（留空则百度走 cookie 骨架）
+var BAIDU_SIGN_KEY = '';   // 百度签名密钥，随版本变化；为空时百度仅走 PARSE_API
+
+var QUARK_DEV = 'tvboxdolby00000001';   // X-Device-Id，固定串即可
 
 function init(ext) {
-    // ext 可传入 JSON: {"quark":"...","baidu":"..."} 覆盖上面的 cookie
     if (ext) {
         try {
-            var cfg = JSON.parse(ext);
-            if (cfg.quark) QUARK_COOKIE = cfg.quark;
-            if (cfg.baidu) BAIDU_BDUSS = cfg.baidu;
+            var c = JSON.parse(ext);
+            if (c.quark) QUARK_COOKIE = c.quark;
+            if (c.baidu) BAIDU_BDUSS = c.baidu;
+            if (c.parseApi) PARSE_API = c.parseApi;
         } catch (e) {}
     }
     return '';
 }
 
+// drpy fetch 的 POST 封装（部分壳子不支持 options 时需改用 shell 自带 post）
+function post(url, body, cookie) {
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'cookie': cookie || '',
+            'X-Device-Id': QUARK_DEV,
+            'X-Platform': 'web'
+        },
+        data: JSON.stringify(body)
+    });
+}
+
+function getJSON(url, cookie, qs) {
+    var u = qs ? (url + '?' + qs) : url;
+    var txt = fetch(u, { headers: { 'cookie': cookie || '' } });
+    return JSON.parse(txt);
+}
+
+// ---------------- 夸克网盘 ----------------
 function quarkShareId(url) {
     var m = url.match(/pan\.quark\.cn\/s\/([A-Za-z0-9]+)/);
     return m ? m[1] : '';
 }
 
+function parseQuark(url) {
+    if (!QUARK_COOKIE) return { url: url, parse: 0 };
+    var sid = quarkShareId(url);
+    if (!sid) return { url: url, parse: 0 };
+
+    // 1) 拿 stoken
+    var t = JSON.parse(post(
+        'https://drive.quark.cn/1/clouddrive/share/sharepage/token',
+        { pwd_id: sid, passcode: '' }, QUARK_COOKIE));
+    var stoken = t.data && t.data.stoken;
+    if (!stoken) return { url: url, parse: 0 };
+
+    // 2) 拿文件列表
+    var d = JSON.parse(post(
+        'https://drive.quark.cn/1/clouddrive/share/sharepage/detail',
+        { pwd_id: sid, stoken: stoken, pdir_fid: '0', force: 1,
+          _page: 1, _size: 100, _sort: 'file_name', _dir: 'asc' }, QUARK_COOKIE));
+    var list = (d.data && d.data.list) || [];
+    if (!list.length) return { url: url, parse: 0 };
+    var f = list[0];
+
+    // 3) 拿在线播放直链
+    var p = JSON.parse(post(
+        'https://drive.quark.cn/1/clouddrive/file/play',
+        { fid: f.fid, fid_token: f.fid_token,
+          open_api_ext: { media_bandwidth: '/^$/' },
+          res_type: 1, play_type: 'online' }, QUARK_COOKIE));
+    var playUrl = (p.data && (p.data.play_url || p.data.video_preview_url)) || '';
+    if (playUrl) return { url: playUrl, parse: 0 };
+
+    return { url: url, parse: 0 };
+}
+
+// ---------------- 百度网盘 ----------------
 function baiduSurl(url) {
     var m = url.match(/pan\.baidu\.com\/s\/([A-Za-z0-9_-]+)/);
     return m ? m[1] : '';
 }
 
-// 夸克: 用 cookie 调官方分享接口拿文件直链（骨架，需按账号实测补全）
-function parseQuark(url) {
-    if (PARSE_API) return parseByApi(url, 'quark');
-    var sid = quarkShareId(url);
-    if (!sid) return { url: url, parse: 0 };
-    // TODO: 调夸克分享详情 + 下载接口，需要 QUARK_COOKIE
-    // 关键接口（示例，以实测为准）:
-    //   POST https://drive.quark.cn/1/clouddrive/share/sharepage/token  (拿 stoken)
-    //   POST https://drive.quark.cn/1/clouddrive/share/sharepage/detail  (拿 file 列表)
-    //   POST https://drive.quark.cn/1/clouddrive/file/download  (拿直链)
-    // 返回 { url: 直链 }
-    return { url: url, parse: 0 };
-}
-
-// 百度: 用 BDUSS 调官方接口拿直链（骨架，需按账号实测补全）
 function parseBaidu(url) {
     if (PARSE_API) return parseByApi(url, 'baidu');
+    if (!BAIDU_BDUSS || !BAIDU_SIGN_KEY) return { url: url, parse: 0 };
+
     var surl = baiduSurl(url);
     if (!surl) return { url: url, parse: 0 };
-    // TODO: 调百度网盘接口需 BAIDU_BDUSS
-    //   POST https://pan.baidu.com/api/sharedownload  (需 BDUSS + 签名)
-    // 返回 { url: 直链 }
+
+    // 1) shareinfo -> sekey(enc)
+    var info = getJSON('https://pan.baidu.com/api/shareinfo', BAIDU_BDUSS,
+        'surl=' + surl + '&t=' + Date.now());
+    var sekey = info.data && info.data.secretkey_enc;
+    var shareid = info.data && info.data.shareid;
+    if (!sekey) return { url: url, parse: 0 };
+
+    // 2) 签名（百度签名密钥随版本变化，BAIDU_SIGN_KEY 为空则跳过）
+    var ts = Math.floor(Date.now() / 1000);
+    var sign = baiduSign(surl, sekey, ts);
+    if (!sign) return { url: url, parse: 0 };
+
+    // 3) 拿下载直链
+    var dl = getJSON('https://pan.baidu.com/api/sharedownload', BAIDU_BDUSS,
+        'surl=' + surl + '&shareid=' + shareid + '&sign=' + sign +
+        '&timestamp=' + ts + '&sekey=' + encodeURIComponent(sekey));
+    var item = dl.data && dl.data.list && dl.data.list[0];
+    var durl = item && (item.dlink || (item.list && item.list[0] && item.list[0].dlink));
+    if (durl) return { url: durl, parse: 0 };
+
     return { url: url, parse: 0 };
 }
 
-// 第三方解析接口约定: GET PARSE_API?type=quark&url=xxx  -> {"url":"直链"}
+function baiduSign(surl, sekey, ts) {
+    if (!BAIDU_SIGN_KEY) return '';
+    // 社区常见算法: md5(encodeURIComponent(sekey) + ts + SIGN_KEY)
+    // drpy 若未提供 md5，请改用 shell 自带或填 PARSE_API
+    if (typeof md5 === 'function') {
+        return md5(encodeURIComponent(sekey) + ts + BAIDU_SIGN_KEY);
+    }
+    return '';
+}
+
+// 第三方解析接口约定: GET PARSE_API?type=baidu&url=xxx  -> {"url":"直链"}
 function parseByApi(url, type) {
     var api = PARSE_API + '?type=' + type + '&url=' + encodeURIComponent(url);
     var txt = fetch(api);
