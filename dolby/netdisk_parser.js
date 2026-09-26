@@ -22,6 +22,8 @@ var QUARK_COOKIE = '';     // 夸克 ck
 var BAIDU_BDUSS  = '';     // 百度 BDUSS
 var PARSE_API    = '';     // 可选：百度解析兜底接口（留空则百度走 cookie 骨架）
 var BAIDU_SIGN_KEY = '';   // 百度签名密钥，随版本变化；为空时百度仅走 PARSE_API
+var CFG_QUALITY = '原画';  // 网盘清晰度（来自网盘配置小站 ext）
+var CFG_THREADS = 32;      // 解析/下载线程数（来自网盘配置小站 ext）
 
 var QUARK_DEV = 'tvboxdolby00000001';   // X-Device-Id，固定串即可
 
@@ -32,6 +34,8 @@ function init(ext) {
             if (c.quark) QUARK_COOKIE = c.quark;
             if (c.baidu) BAIDU_BDUSS = c.baidu;
             if (c.parseApi) PARSE_API = c.parseApi;
+            if (c.quality) CFG_QUALITY = c.quality;
+            if (c.threads) CFG_THREADS = c.threads;
         } catch (e) {}
     }
     return '';
@@ -84,12 +88,12 @@ function parseQuark(url) {
     if (!list.length) return { url: url, parse: 0 };
     var f = list[0];
 
-    // 3) 拿在线播放直链
+    // 3) 拿在线播放直链（quality 由网盘配置小站的清晰度决定）
     var p = JSON.parse(post(
         'https://drive.quark.cn/1/clouddrive/file/play',
         { fid: f.fid, fid_token: f.fid_token,
           open_api_ext: { media_bandwidth: '/^$/' },
-          res_type: 1, play_type: 'online' }, QUARK_COOKIE));
+          res_type: 1, play_type: 'online', quality: CFG_QUALITY }, QUARK_COOKIE));
     var playUrl = (p.data && (p.data.play_url || p.data.video_preview_url)) || '';
     if (playUrl) return { url: playUrl, parse: 0 };
 
