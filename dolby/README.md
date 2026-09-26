@@ -42,6 +42,25 @@ subscribe/spider 模板        ──┘                     │
 > MacCMS 站的特征：能用 `/api.php/provide/vod?ac=list&pg=1` 拿到 JSON 列表。
 > 你专注杜比/4K原盘，就挑这类站点填进去，爬虫会自动按关键词只留杜比片。
 
+> **关于"真实杜比源"**：普通 MacCMS 综合站的数据里**不标注"杜比"**，靠关键词筛不出杜比片。
+> 本项目默认启用 `type: dolby_list` 的源——以 **Dolby 官方杜比视界/全景声院线片单**为权威
+> 清单（保证"全都是杜比"），逐片去 `search_sources`（综合站）搜真实播放地址组装 catalog。
+> 配置示例：
+> ```json
+> {
+>   "name": "Dolby官方杜比片单 + 综合站搜索",
+>   "type": "dolby_list",
+>   "list_url": "https://professional.dolby.com/zh-cn/cinema/theatrical-releases",
+>   "search_sources": ["http://cj.lziapi.com/api.php/provide/vod"],
+>   "play_flag": "杜比电影",
+>   "min_year": 2023,
+>   "max_movies": 40
+> }
+> ```
+> `max_movies` 只是沙箱验证用的数量上限，**你本机跑全量请删掉这一行**（约 150 部，几分钟抓完）。
+> 想要**真·杜比原盘（4K原盘+杜比视界双层+全景声，走网盘）**，把某个 MacCMS 原盘站填进
+> `type: maccms` 源并 `enabled: true`（当前是占位示例）。注意这类原盘站多需特殊网络才能访问。
+
 ### 2. 跑爬虫（本地）
 ```bash
 python crawler.py            # 真实抓取
@@ -125,7 +144,7 @@ python server.py --port 9000 # 自定义端口
 | 文件 | 作用 |
 |------|------|
 | `config.json` | 源地址 + 杜比关键词 + GitHub 目标 |
-| `crawler.py` | 爬虫，抓 MacCMS 源并严格过滤杜比，输出 catalog.json |
+| `crawler.py` | 爬虫：支持 `dolby_list`（Dolby官方片单+搜源）与 `maccms`（原盘站过滤）两种模式 |
 | `spider.js` | TVBox drpy 蜘蛛，读取 catalog.json 当资源站 |
 | `subscribe.json` | TVBox 站点导入入口（type:3 + spider） |
 | `netdisk_parser.js` | 网盘解析蜘蛛模板（夸克/百度），播放侧需填你的 cookie/接口 |
