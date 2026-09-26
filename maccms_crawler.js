@@ -10,7 +10,8 @@
  *
  * 依赖关系说明：sun 仅在「每天构建时」被访问一次；导入 TVBox 后运行时
  * 只依赖我们自己仓库（raw.githubusercontent.com/xiaohuya520/tvbox-dc）。
- * sun 哪天挂了/换地址/加防盗链，我们单仓照常可用，只是当天不更新。
+ * sun 哪天挂了/换地址/加防盗链：自动改用仓库里的 sun_sites_cache.json
+ * （最近一次成功解密的站点快照），单仓照常完整重建，不丢站点。
  *
  * 用法：
  *   - 本地：  node maccms_crawler.js
@@ -147,7 +148,17 @@ async function main() {
     const all = Array.isArray(sun.sites) ? sun.sites : [];
     sites.push(...all);
     sunCount = all.length;
-    console.log(`  ✅ 并入 sun 全部站点 ${all.length} 个`);
+    // 刷新缓存：把解密后的 sun 站点存进仓库。sun 哪天挂了/消失，下次构建用它兜底
+    try {
+      fs.writeFileSync(
+        path.join(__dirname, 'sun_sites_cache.json'),
+        JSON.stringify({ updated: new Date().toISOString(), count: all.length, sites: all }, null, 2),
+        'utf-8'
+      );
+      console.log(`  ✅ 并入 sun 全部站点 ${all.length} 个（已刷新缓存 sun_sites_cache.json）`);
+    } catch (ce) {
+      console.log(`  ⚠️ 缓存写入失败: ${ce.message}`);
+    }
 
     // 下载 sun 的 spider jar，自托管到本仓库 jar/sun_spider.jar
     const { url: jarUrl, md5: jarMd5 } = parseSpider(sun.spider);
@@ -171,7 +182,20 @@ async function main() {
     }
   } catch (e) {
     console.log(`  ❌ sun 获取失败: ${e.message}`);
-    // 兜底：仓库里已有上次自托管的 jar 就继续用（导入端仍不依赖 sun）
+    // 兜底1：用上次缓存的 sun 站点（sun 挂了，单仓照样完整）
+    const cacheFile = path.join(__dirname, 'sun_sites_cache.json');
+    if (fs.existsSync(cacheFile)) {
+      try {
+        const cached = JSON.parse(fs.readFileSync(cacheFile, 'utf-8'));
+        const cs = Array.isArray(cached.sites) ? cached.sites : [];
+        sites.push(...cs);
+        sunCount = cs.length;
+        console.log(`  ↩️ 使用缓存的 sun 站点 ${cs.length} 个（缓存于 ${cached.updated || '未知时间'}）`);
+      } catch (pe) {
+        console.log(`  ⚠️ 缓存读取失败: ${pe.message}`);
+      }
+    }
+    // 兜底2：仓库里已有上次自托管的 jar 就继续用（导入端仍不依赖 sun）
     const localJar = path.join(__dirname, 'jar', 'sun_spider.jar');
     if (fs.existsSync(localJar)) {
       const md5 = crypto.createHash('md5').update(fs.readFileSync(localJar)).digest('hex');
