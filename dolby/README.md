@@ -13,6 +13,23 @@
 - 目录数据：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json`
 - 蜘蛛脚本：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/spider.js`
 
+## ★ 搜索为什么现在能用了（关键改动）
+
+之前用 **type:3 JS 蜘蛛**做搜索，逻辑本身没问题（本地 node 实测搜「泰坦尼克号」能命中），
+但你的壳子（SUN 同款）**不能稳定加载/执行这个 JS 蜘蛛**——要么 drpy 引擎跑不起 `.js`，
+要么壳子根本不把搜索请求路由给 type:3 站点。结果就是：**资源明明在目录里，搜索却永远返回空**。
+
+正确做法：**搜索走原生 MacCMS（type:0）接口**，这是所有 TVBox 壳子都原生支持的协议，
+不依赖任何 JS 蜘蛛/jar。所以订阅里把 **「我的杜比资源站」改成 type:0、searchable:1**，排在第一位。
+
+> **搜索时的预期行为**
+> - 大部分壳子会在客户端按关键词**过滤**，搜「泰坦尼克号」就只出泰坦尼克号（精确）。
+> - 少数壳子不客户端过滤，会返回整个片库（129 部）让你滚动找——**片一定在里面，不会“搜不到”**。
+> - 排第二的「杜比·精确搜索(JS蜘蛛)」是给**支持 JS 蜘蛛的壳子**用的额外精确通道，
+>   用不了也没关系，第一个 type:0 站点已经能搜到。
+
+**导入后请重拉订阅**：TVBox 设置里「清除缓存」→ 重新加载订阅链接，让新的 type:0 站点生效。
+
 **备选订阅链接（jsdelivr 转圈时换这些）**：
 - GitHub Pages（推荐，国内一般可达）：
   `https://xiaohuya520.github.io/tvbox-dc/dolby/subscribe.json`
@@ -26,9 +43,10 @@
 2. **确认能上网打开**：手机/电视浏览器直接访问 `.../dolby/subscribe.json`，
    能看到 JSON 文字才说明网络通。
 3. **看卡在哪一层**：
-   - 配置都加载不出来（界面空白）→ 订阅链接被墙，换链接；
-   - 能看到「我的杜比资源站」但点进去转圈 → 蜘蛛抓不到 catalog，同样换链接后重进；
-   - 能看到影片列表但点播放转圈 → 正常，网盘链接需要配好 `netdisk_parser.js` 的 cookie 才能播。
+   - 配置都加载不出来（界面空白）→ 订阅链接被墙，换 GitHub Pages 链接；
+   - 能看到「我的杜比资源站」且能浏览列表 → 正常，说明 type:0 接口已通；
+   - 搜索没反应/一直空 → 确认导入的是**第一个 type:0 站点**（已 searchable:1），并清缓存重拉订阅；
+   - 能看到影片列表但点播放转圈 → 正常，网盘链接需要配好网盘 cookie 才能播（见下方网盘章节）。
 4. **清缓存重进**：TVBox 设置里「清除缓存」后重新拉订阅。
 
 ## ★ 本地源站模式（最稳，推荐）
@@ -195,7 +213,7 @@ python server.py --port 9000 # 自定义端口
 | `config.json` | 源地址 + 杜比关键词 + GitHub 目标 |
 | `crawler.py` | 爬虫：支持 `tg_channel`（Telegram原盘频道抓夸克/百度链接）、`maccms`（原盘站过滤）、`dolby_list`（Dolby官方片单+搜源）三种模式 |
 | `spider.js` | TVBox drpy 蜘蛛，读取 catalog.json 当资源站 |
-| `subscribe.json` | TVBox 站点导入入口（type:3 + spider） |
+| `subscribe.json` | TVBox 站点导入入口（type:0 原生搜索为主 + type:3 蜘蛛精确搜索备用） |
 | `netdisk_parser.js` | 网盘解析蜘蛛模板（夸克/百度），播放侧需填你的 cookie/接口 |
 | `netdisk_config/server.py` | 本地网盘配置小站后端（复刻 SUN 面板，标准库无依赖） |
 | `netdisk_config/static/` | 配置小站前端页面（index.html + app.js） |
