@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /*
- * maccms_crawler.js —— 我们自己的爬虫程序（纯 JS，无需编译）
+ * maccms_crawler.js —— 我们自己的爬虫程序 v3（纯 JS，无需编译）
  *
- * 生成 mybox-self.json，由两部分组成：
+ * 生成 mybox-self.json（完全去 sun 化，导入后不依赖 sun 的任何链接）：
  *   A) 探测一批「苹果CMS v10 综合影视资源站」哪些在线 → 打包成 type:1 站点
- *   B) 动态抓取 sun.json（加密配置，AES-CBC）→ 解密 → 提取用户指定的
- *      20 个 type:3 爬虫站点（热播/剧圈/半日/苹果/天堂/茉莉/哔哩/华谊/
- *      三六零/快映/虎斑/王子/闪电/人人/八零/独播/爱看/趣盘/种子），
- *      并带上 sun 的 spider jar（每次取最新，jar 地址变了自动跟随）
+ *   B) 抓取 sun.json（加密配置，AES-CBC）→ 解密 → 提取【全部站点】
+ *   C) 下载 sun 的 spider jar（图片伪装）→ 存入本仓库 jar/sun_spider.jar 自托管
+ *      → mybox-self.json 的 spider 指向我们自己仓库的 jar 地址
+ *
+ * 依赖关系说明：sun 仅在「每天构建时」被访问一次；导入 TVBox 后运行时
+ * 只依赖我们自己仓库（raw.githubusercontent.com/xiaohuya520/tvbox-dc）。
+ * sun 哪天挂了/换地址/加防盗链，我们单仓照常可用，只是当天不更新。
  *
  * 用法：
  *   - 本地：  node maccms_crawler.js
@@ -20,6 +23,9 @@ const crypto = require('crypto');
 
 const UA = 'okhttp/3.15';
 const TIMEOUT = 9000;
+
+// 自托管 jar 的对外地址（导入后的单仓只认这个，不再认 sun 的动态地址）
+const SELF_JAR_URL = 'https://raw.githubusercontent.com/xiaohuya520/tvbox-dc/main/jar/sun_spider.jar';
 
 // ===== A. 候选苹果CMS资源站（type:1，TVBox 原生抓取）=====
 const CANDIDATES = [
@@ -35,18 +41,14 @@ const CANDIDATES = [
   { key: 'shandian', name: '闪电资源',   api: 'http://sdzyapi.com/api.php/provide/vod' },
 ];
 
-// ===== B. sun.json 及要并入的站点白名单（type:3，依赖 sun 的 spider jar）=====
+// ===== B. sun.json（构建时数据源，运行时不依赖）=====
 const SUN_URL = 'https://9877.kstore.space/sun.json';
-const SUN_SITE_KEYS = [
-  '热播影视', '剧圈99', '半日99', '苹果', '天堂', '华谊', '王子', '茉莉',
-  '哔哩视频', '哔哩合集', '三六零', '快映', '闪电', '八零', '虎斑',
-  '种子', '人人', '独播影视', '爱看机器人', '趣盘',
-];
 
-function fetchWithTimeout(url, ms) {
+function fetchWithTimeout(url, ms, binary = false) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), ms);
   return fetch(url, { signal: ctrl.signal, redirect: 'follow', headers: { 'User-Agent': UA } })
+    .then(async (res) => (binary ? { ok: res.ok, status: res.status, buf: Buffer.from(await res.arrayBuffer()) } : res))
     .finally(() => clearTimeout(timer));
 }
 
@@ -70,6 +72,17 @@ async function fetchSun() {
   } catch (e) {
     return JSON.parse(decryptTvbox(text)); // 加密配置
   }
+}
+
+// spider 字段形如 "https://xxx/yyy.png;md5;hash" —— 取出纯 URL 和 md5
+function parseSpider(s) {
+  if (!s) return { url: '', md5: '' };
+  const parts = String(s).split(';');
+  const url = parts[0];
+  let md5 = '';
+  const mi = parts.findIndex((p) => p === 'md5');
+  if (mi >= 0 && parts[mi + 1]) md5 = parts[mi + 1];
+  return { url, md5 };
 }
 
 // ===== A 的探测逻辑 =====
@@ -126,31 +139,50 @@ async function main() {
     }
   }
 
-  // B) 抓取并解密 sun.json，提取白名单站点
-  console.log(`[爬虫B] 抓取 sun.json 并提取 ${SUN_SITE_KEYS.length} 个站点...`);
+  // B+C) 抓取 sun.json：全部站点 + 自托管 jar
+  console.log(`[爬虫B] 抓取 sun.json（全部站点 + jar 自托管）...`);
   try {
     const sun = await fetchSun();
     const all = Array.isArray(sun.sites) ? sun.sites : [];
-    const picked = all.filter((s) => SUN_SITE_KEYS.includes(s.key));
-    for (const k of SUN_SITE_KEYS) {
-      const s = picked.find((x) => x.key === k);
-      if (s) {
-        sites.push(s);
-        console.log(`  ✅ ${s.name}`);
+    sites.push(...all);
+    sunCount = all.length;
+    console.log(`  ✅ 并入 sun 全部站点 ${all.length} 个`);
+
+    // 下载 sun 的 spider jar，自托管到本仓库 jar/sun_spider.jar
+    const { url: jarUrl, md5: jarMd5 } = parseSpider(sun.spider);
+    if (jarUrl) {
+      console.log(`[爬虫C] 下载 sun spider jar: ${jarUrl}`);
+      const r = await fetchWithTimeout(jarUrl, 30000, true);
+      if (r.ok && r.buf.length > 1000) {
+        const jarDir = path.join(__dirname, 'jar');
+        fs.mkdirSync(jarDir, { recursive: true });
+        fs.writeFileSync(path.join(jarDir, 'sun_spider.jar'), r.buf);
+        const localMd5 = crypto.createHash('md5').update(r.buf).digest('hex');
+        if (jarMd5 && jarMd5 !== localMd5) {
+          console.log(`  ⚠️ md5 不一致（sun声明=${jarMd5} 本地=${localMd5}），以本地为准`);
+        }
+        spider = `${SELF_JAR_URL};md5;${localMd5}`;
+        console.log(`  ✅ jar 已自托管 (${r.buf.length} 字节, md5=${localMd5})`);
+        console.log(`  ✅ spider 指向: ${SELF_JAR_URL}`);
       } else {
-        console.log(`  ⚠️ 未找到 key=${k}（sun 可能已更新站点名单）`);
+        throw new Error(`jar 下载失败 HTTP ${r.status}`);
       }
     }
-    if (sun.spider) spider = sun.spider;
-    sunCount = picked.length;
   } catch (e) {
-    console.log(`  ❌ sun.json 获取失败: ${e.message}（本次仅输出资源站）`);
+    console.log(`  ❌ sun 获取失败: ${e.message}`);
+    // 兜底：仓库里已有上次自托管的 jar 就继续用（导入端仍不依赖 sun）
+    const localJar = path.join(__dirname, 'jar', 'sun_spider.jar');
+    if (fs.existsSync(localJar)) {
+      const md5 = crypto.createHash('md5').update(fs.readFileSync(localJar)).digest('hex');
+      spider = `${SELF_JAR_URL};md5;${md5}`;
+      console.log(`  ↩️ 沿用仓库已自托管的 jar（md5=${md5}），本次仅不更新 sun 站点`);
+    }
   }
 
   const box = { spider, sites, lives: [], parses: [], flags: [], rules: {} };
   const out = path.join(__dirname, 'mybox-self.json');
   fs.writeFileSync(out, JSON.stringify(box, null, 2), 'utf-8');
-  console.log(`\n[完成] 资源站 ${sites.length - sunCount} + sun站 ${sunCount} = 共 ${sites.length} 个，spider ${spider ? '已带(sun最新)' : '空'}，已写入 ${out}`);
+  console.log(`\n[完成] 资源站 ${sites.length - sunCount} + sun站 ${sunCount} = 共 ${sites.length} 个，spider ${spider ? '自托管OK' : '空'}，已写入 ${out}`);
 }
 
 main().catch((e) => { console.error('FATAL', e); process.exit(1); });
