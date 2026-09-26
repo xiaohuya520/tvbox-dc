@@ -538,6 +538,8 @@ def main():
     # MacCMS 兼容静态格式：带 class（type:0 静态站可用）+ 分页字段 + 全量 list
     items = list(collected.values())
     catalog = {
+        "code": 1,
+        "msg": "",
         "updated": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "class": [
             {"type_id": "1", "type_name": "夸克网盘"},
