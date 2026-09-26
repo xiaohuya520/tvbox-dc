@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>杜比资源站 · 网盘配置</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #0f1115; color: #e6e6e6; min-height: 100vh;
+    display: flex; justify-content: center; padding: 24px;
+  }
+  .wrap { width: 100%; max-width: 560px; }
+  .head {
+    background: linear-gradient(90deg, #7b2ff7 0%, #2f80ed 100%);
+    padding: 20px 24px; border-radius: 14px 14px 0 0; text-align: center;
+  }
+  .head h1 { font-size: 20px; font-weight: 600; }
+  .head p { font-size: 12px; opacity: .85; margin-top: 6px; }
+  .card {
+    background: #1a1d24; border-radius: 0 0 14px 14px; padding: 20px 22px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+  }
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+  .tab {
+    flex: 1; text-align: center; padding: 10px; border-radius: 10px;
+    background: #23272f; cursor: pointer; font-size: 14px; user-select: none;
+    border: 1px solid transparent;
+  }
+  .tab.active { border-color: #2f80ed; color: #fff; background: #2a2f3a; }
+  .row { display: flex; align-items: center; justify-content: space-between; margin: 14px 0; }
+  .row label { font-size: 14px; color: #b9c0cc; }
+  select, .btn {
+    background: #23272f; color: #e6e6e6; border: 1px solid #333a45;
+    border-radius: 8px; padding: 8px 12px; font-size: 14px; cursor: pointer;
+  }
+  .btn:hover { border-color: #2f80ed; }
+  .btn.danger { border-color: #b3261e; color: #ff8a80; }
+  .btn.primary { background: #2f80ed; border-color: #2f80ed; color: #fff; }
+  .qrbox {
+    margin: 14px 0; border: 1px dashed #333a45; border-radius: 12px;
+    min-height: 240px; display: flex; align-items: center; justify-content: center;
+    background: #fff; padding: 10px; position: relative; overflow: hidden;
+  }
+  .qrbox iframe, .qrbox img { width: 220px; height: 220px; border: 0; }
+  .qrbox .ph { color: #999; font-size: 13px; }
+  .status { text-align: center; min-height: 22px; font-size: 14px; font-weight: 500; margin: 8px 0; }
+  .status.waiting { color: #ffb74d; }
+  .status.scanned { color: #4fc3f7; }
+  .status.confirmed { color: #66bb6a; }
+  .status.error { color: #ff8a80; }
+  .cookie-line { font-size: 12px; color: #8a93a3; word-break: break-all; }
+  .manual { margin-top: 12px; }
+  .manual textarea {
+    width: 100%; height: 64px; background: #11141a; color: #cfd6e0;
+    border: 1px solid #333a45; border-radius: 8px; padding: 8px; font-size: 12px;
+    resize: vertical;
+  }
+  .hint { font-size: 11px; color: #6b7280; margin-top: 6px; line-height: 1.5; }
+  .divider { height: 1px; background: #23272f; margin: 18px 0; }
+  .ext-box {
+    margin-top: 10px; background: #11141a; border: 1px solid #333a45;
+    border-radius: 8px; padding: 10px; font-size: 12px; color: #9fb3c8;
+    word-break: break-all; white-space: pre-wrap; max-height: 120px; overflow: auto;
+  }
+  .small { font-size: 12px; color: #8a93a3; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>杜比资源站 · 网盘配置</h1>
+    <p>复刻 SUN 网盘面板：扫码登录 · 清除Cookie · 清晰度 · 线程数</p>
+  </div>
+  <div class="card">
+    <div class="tabs">
+      <div class="tab active" data-prov="quark">夸克网盘</div>
+      <div class="tab" data-prov="baidu">百度网盘</div>
+    </div>
+
+    <!-- 清晰度 / 线程数 -->
+    <div class="row">
+      <label>网盘清晰度</label>
+      <select id="quality"></select>
+    </div>
+    <div class="row">
+      <label>解析/下载线程</label>
+      <select id="threads"></select>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 扫码登录 -->
+    <div class="row">
+      <label>扫码登录</label>
+      <button class="btn primary" id="loginBtn">获取二维码</button>
+    </div>
+    <div class="qrbox"><span class="ph">点击「获取二维码」后用对应 App 扫描</span></div>
+    <div class="status" id="status"></div>
+
+    <!-- 手动粘贴兜底 -->
+    <div class="manual">
+      <label class="small">自动提取失败？手动粘贴 cookie（不发送给我，仅存本地）：</label>
+      <textarea id="manualCookie" placeholder="夸克粘贴 ck=... 整段 / 百度粘贴 BDUSS=... 整段"></textarea>
+      <div style="margin-top:8px;text-align:right">
+        <button class="btn" id="manualBtn">保存粘贴的Cookie</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- 当前 cookie 状态 + 清除 -->
+    <div class="row">
+      <div>
+        <div class="small">当前Cookie</div>
+        <div class="cookie-line" id="cookieState">—</div>
+      </div>
+      <button class="btn danger" id="clearBtn">清除Cookie</button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row">
+      <label class="small">TVBox 网盘站点 ext（复制后粘到 TVBox 对应网盘站点的 ext 里）</label>
+    </div>
+    <div class="ext-box" id="extBox">点击「生成 ext」</div>
+    <div style="margin-top:8px;text-align:right">
+      <button class="btn" id="extBtn">生成 ext</button>
+    </div>
+    <div class="hint">
+      提示：本小站只管理你本机 cookie，不会上传 GitHub。浏览器关掉即停。
+      夸克扫码若提示「接口调整」，用下方手动粘贴 ck 即可，效果一样。
+    </div>
+  </div>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
