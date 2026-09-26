@@ -1,25 +1,20 @@
 {
   "sites": [
     {
-      "key": "DolbySpider26",
+      "key": "DolbyV127",
       "name": "我的杜比资源站(可搜索)",
-      "type": 3,
-      "api": "https://xiaohuya520.github.io/tvbox-dc/dolby/spider.js",
-      "ext": {
-        "urls": [
-          "https://xiaohuya520.github.io/tvbox-dc/dolby/catalog.json",
-          "https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json",
-          "https://fastly.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json"
-        ]
-      },
+      "type": 0,
+      "api": "https://xiaohuya520.github.io/tvbox-dc/dolby/catalog.json",
+      "spider": "https://xiaohuya520.github.io/tvbox-dc/dolby/spider.js",
+      "ext": "{\"spider\":\"https://xiaohuya520.github.io/tvbox-dc/dolby/spider.js\",\"urls\":[\"https://xiaohuya520.github.io/tvbox-dc/dolby/catalog.json\",\"https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json\"]}",
       "searchable": 1,
       "quickSearch": 1,
       "playable": 1,
       "timeout": 15
     },
     {
-      "key": "DolbyHome26",
-      "name": "我的杜比资源站(浏览兜底)",
+      "key": "DolbyV227",
+      "name": "我的杜比资源站(仅浏览)",
       "type": 0,
       "api": "https://xiaohuya520.github.io/tvbox-dc/dolby/catalog.json",
       "searchable": 0,
