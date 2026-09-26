@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-26T13:58:14",
+ "updated": "2026-09-27T00:47:19",
  "class": [
   {
    "type_id": "1",
@@ -16,8 +16,8 @@
  ],
  "page": 1,
  "pagecount": 1,
- "limit": 129,
- "total": 129,
+ "limit": 130,
+ "total": 130,
  "list": [
   {
    "vod_id": 1,
@@ -2469,6 +2469,25 @@
    "vod_actor": "",
    "vod_director": "",
    "type_name": "杜比原盘"
+  },
+  {
+   "vod_id": 130,
+   "vod_name": "Ekis 2025 (WEB-DL 他加禄语 菲律宾)",
+   "vod_pic": "",
+   "vod_remarks": "2160p WEB-DL|百度网盘",
+   "vod_year": "2025",
+   "vod_content": "菲律宾新黑色惊悚片，Christian Paolo Lat 执导，2025-12-19 于 Vivamax 上线（R-18）。全女性犯罪团伙策划绑架勒索，计划败露后陷入背叛与血腥逃亡。来源为 WEB-DL，非 4K原盘REMUX/杜比视界。",
+   "vod_play_from": "百度网盘",
+   "vod_play_url": "正片$https://pan.baidu.com/s/14sCYlM57Fj3FlubGESK3iQ?pwd=2026",
+   "vod_netdisk": "百度网盘",
+   "vod_time": "2026-09-27 00:47:19",
+   "vod_hits": 0,
+   "vod_score": 0.0,
+   "vod_serial": "",
+   "vod_status": 1,
+   "vod_actor": "Angela Morena / Cheena Dizon / Aliya Raymundo",
+   "vod_director": "Christian Paolo Lat",
+   "type_name": "WEB-DL"
   }
  ],
  "code": 1,
