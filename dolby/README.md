@@ -29,37 +29,40 @@ subscribe/spider 模板        ──┘                     │
 ## 使用步骤
 
 ### 1. 配置抓取源
-编辑 `config.json` → `sources`，把示例源换成**苹果CMS(MacCMS)格式**的杜比/4K 站点 API 地址：
-```json
-{
-  "name": "某某杜比站",
-  "type": "maccms",
-  "api": "https://站点域名/api.php/provide/vod",
-  "enabled": true,
-  "play_flag": "杜比线路"
-}
-```
-> MacCMS 站的特征：能用 `/api.php/provide/vod?ac=list&pg=1` 拿到 JSON 列表。
-> 你专注杜比/4K原盘，就挑这类站点填进去，爬虫会自动按关键词只留杜比片。
+编辑 `config.json` → `sources`。当前默认启用的是 `type: tg_channel`（Telegram 公开原盘频道）。
+**加频道**：在对应源的 `channels` 数组里加频道用户名（去掉 @）。**加 MacCMS 原盘站**：新增一个
+`type: maccms` 源并 `enabled:true`。**关键开关**：
+- `netdisk.require_netdisk: true` —— 只收带夸克/百度等网盘链接的资源（原盘站必备，已开）。
+- 源的 `require_remux: true` —— 只收真实原盘（含 原盘/REMUX/UHD）；设 `false` 则也收杜比高码率。
+- 源的 `require_dolby: true` —— 只收杜比视界/杜比全景声。
 
-> **关于"真实杜比源"**：普通 MacCMS 综合站的数据里**不标注"杜比"**，靠关键词筛不出杜比片。
-> 本项目默认启用 `type: dolby_list` 的源——以 **Dolby 官方杜比视界/全景声院线片单**为权威
-> 清单（保证"全都是杜比"），逐片去 `search_sources`（综合站）搜真实播放地址组装 catalog。
-> 配置示例：
+> **真实原盘 + 网盘（当前默认模式 `tg_channel`）**
+> 你要的是**真实 4K 原盘（杜比视界/杜比全景声，走网盘）**，不是在线 m3u8。这类资源几乎全在
+> Telegram 公开原盘频道里用**夸克/百度网盘**分享。所以本项目主源是 `type: tg_channel`——
+> 直接抓公开频道页 `https://t.me/s/频道名`，解析出夸克/百度分享链接，按「原盘/REMUX + 杜比视界/杜比全景声」
+> 严格过滤，**夸克为主、百度为辅**。配置示例：
 > ```json
 > {
->   "name": "Dolby官方杜比片单 + 综合站搜索",
->   "type": "dolby_list",
->   "list_url": "https://professional.dolby.com/zh-cn/cinema/theatrical-releases",
->   "search_sources": ["http://cj.lziapi.com/api.php/provide/vod"],
->   "play_flag": "杜比电影",
->   "min_year": 2023,
->   "max_movies": 40
+>   "name": "Telegram 公开原盘频道（夸克为主/百度为辅）",
+>   "type": "tg_channel",
+>   "enabled": true,
+>   "require_remux": true,   // 必须含 原盘/REMUX/UHD（真实原盘）
+>   "require_dolby": true,   // 必须含 杜比视界/杜比全景声
+>   "max_pages": 6,          // 每个频道翻几页（每页约20条）
+>   "channels": ["dianying4K", "MFFXQF", "Oscar_4Kmovies",
+>                "Aliyun_4K_Movies", "Netdisk_Movies", "Quark_Movies",
+>                "vip115hot", "XiangxiuNB"]
 > }
 > ```
-> `max_movies` 只是沙箱验证用的数量上限，**你本机跑全量请删掉这一行**（约 150 部，几分钟抓完）。
-> 想要**真·杜比原盘（4K原盘+杜比视界双层+全景声，走网盘）**，把某个 MacCMS 原盘站填进
-> `type: maccms` 源并 `enabled: true`（当前是占位示例）。注意这类原盘站多需特殊网络才能访问。
+> 已内置 8 个高质量原盘频道（都带夸克/百度链接）。**想加更多频道，往 `channels` 里加频道用户名**
+> （`@abc123` → 写 `"abc123"` 即可）。
+>
+> ⚠️ **重要**：本沙箱网络**直连不了 `t.me`**（会被重置）。所以 `crawler.py` 要**在你自己能上
+> t.me 的电脑上跑**，才能抓到完整多频道原盘库。仓库里现在的 `data/catalog.json` 是我从公开索引里
+> **确认真实的 35 条夸克/百度原盘链接**做成的初始库；你本机跑一次 `python crawler.py` 就会覆盖成完整实时库。
+>
+> 备选 `type: maccms` 源：若你有能访问的 MacCMS **原盘站** API，填进 `sources` 并 `enabled:true` 即可
+> （当前是占位示例）。备选 `type: dolby_list` 源（Dolby 官方片单 + 综合站搜在线地址，非原盘）已默认关闭。
 
 ### 2. 跑爬虫（本地）
 ```bash
@@ -144,7 +147,7 @@ python server.py --port 9000 # 自定义端口
 | 文件 | 作用 |
 |------|------|
 | `config.json` | 源地址 + 杜比关键词 + GitHub 目标 |
-| `crawler.py` | 爬虫：支持 `dolby_list`（Dolby官方片单+搜源）与 `maccms`（原盘站过滤）两种模式 |
+| `crawler.py` | 爬虫：支持 `tg_channel`（Telegram原盘频道抓夸克/百度链接）、`maccms`（原盘站过滤）、`dolby_list`（Dolby官方片单+搜源）三种模式 |
 | `spider.js` | TVBox drpy 蜘蛛，读取 catalog.json 当资源站 |
 | `subscribe.json` | TVBox 站点导入入口（type:3 + spider） |
 | `netdisk_parser.js` | 网盘解析蜘蛛模板（夸克/百度），播放侧需填你的 cookie/接口 |
