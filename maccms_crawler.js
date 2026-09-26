@@ -149,6 +149,7 @@ async function main() {
   const sites = [];
   let spider = '';
   let sunCount = 0;
+  let sunSpiderRaw = ''; // sun 原始 spider（国内图床 URL，每天跟随 sun 更新）
   const sourceLog = []; // 源头站点探测日志（写进 source_sites.json 给人看）
 
   // A) 探测苹果CMS资源站
@@ -175,11 +176,12 @@ async function main() {
     const all = Array.isArray(sun.sites) ? sun.sites : [];
     sites.push(...all);
     sunCount = all.length;
+    sunSpiderRaw = sun.spider || ''; // sun 自己的 spider（国内图床，"快版"用）
     // 刷新缓存：把解密后的 sun 站点存进仓库。sun 哪天挂了/消失，下次构建用它兜底
     try {
       fs.writeFileSync(
         path.join(__dirname, 'sun_sites_cache.json'),
-        JSON.stringify({ updated: new Date().toISOString(), count: all.length, sites: all }, null, 2),
+        JSON.stringify({ updated: new Date().toISOString(), count: all.length, spider: sunSpiderRaw, sites: all }, null, 2),
         'utf-8'
       );
       console.log(`  ✅ 并入 sun 全部站点 ${all.length} 个（已刷新缓存 sun_sites_cache.json）`);
@@ -219,6 +221,7 @@ async function main() {
         const cs = Array.isArray(cached.sites) ? cached.sites : [];
         sites.push(...cs);
         sunCount = cs.length;
+        sunSpiderRaw = cached.spider || '';
         console.log(`  ↩️ 使用缓存的 sun 站点 ${cs.length} 个（缓存于 ${cached.updated || '未知时间'}）`);
       } catch (pe) {
         console.log(`  ⚠️ 缓存读取失败: ${pe.message}`);
@@ -251,6 +254,17 @@ async function main() {
     'utf-8'
   );
   console.log(`[手机版] mybox-self-cdn.json 已写入（spider 走 jsDelivr png，gh-proxy 不通的手机用）`);
+
+  // 快版：spider 直接指 sun 的国内图床原地址（每天自动跟随 sun 更新，国内加载最快）
+  // 适用：电视/投影等设备拉不动 jsDelivr/gh-proxy 的 1.8MB jar 时
+  const boxFast = JSON.parse(JSON.stringify(box));
+  if (sunSpiderRaw) boxFast.spider = sunSpiderRaw;
+  fs.writeFileSync(
+    path.join(__dirname, 'mybox-self-fast.json'),
+    JSON.stringify(boxFast, null, 2),
+    'utf-8'
+  );
+  console.log(`[快版] mybox-self-fast.json 已写入（spider 指 sun 国内图床: ${sunSpiderRaw.split(';')[0] || '无'}）`);
 
   // D) 纯净版单仓：只有 type:1 直连资源站，无 jar、无 type:3，任何壳子都能导入
   const pureSites = sites.filter((s) => s.type === 1);
