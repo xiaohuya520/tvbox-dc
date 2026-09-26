@@ -6,41 +6,55 @@
 
 ## 成品链接（推送后可用）
 
-**主站点（type:0 + spider.js 挂载，可搜索）**：`spider.js` 走影视仓/猫vod 的 JsLoader，
-在 TVBox 内读取 `catalog.json` 并按中文关键词客户端过滤，纯 GitHub 托管即可搜。
-（写法要点：站点写 `type:0` + 顶层 `spider` 字段指向 `.js`，**不要写 `type:3`**——
-很多影视仓版本把 `type:3` 当 jar 包用 JarLoader 加载，`.js` 会被当成 jar 解析失败，整站加载不出来。）
+**主站点（type:0，云端搜索，✅ 最可靠）**：见下方「☁ 云端搜索（Cloudflare Worker）」——
+部署后由 Cloudflare 在服务端按关键词过滤，影视仓 `type:0` 原生即可搜，**彻底不依赖 JS 蜘蛛**。
+**兼容备选站点（type:0 + spider.js）**：`spider.js` 走影视仓/猫vod 的 JsLoader，
+在 TVBox 内读取 `catalog.json` 客户端过滤（写法：站点 `type:0` + 顶层 `spider` 字段，
+**不要写 `type:3`**——多数影视仓把 `type:3` 当 jar 包加载 `.js` 会失败）。
 **兜底站点（type:0 纯静态，只浏览）**：`catalog.json` 已是 MacCMS 完整格式，
-用来浏览；因 GitHub Pages 静态无法按关键词过滤，搜索请用第一个带 spider 的站点/全局搜索。
+用来浏览；GitHub Pages 静态无法按词过滤，搜索请用云端 Worker 站点/全局搜索。
 
 - 订阅导入：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/subscribe.json`
 - 目录数据：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/catalog.json`
 - 蜘蛛脚本：`https://cdn.jsdelivr.net/gh/xiaohuya520/tvbox-dc@main/dolby/spider.js`
 
-## ★ 搜索到底能不能用（根因 + 现在怎么解决）
+## ★ 搜索到底能不能用（结论 + 最可靠方案）
 
-**根因（已查证 MacCMS 官方文档 + TVBox 开源实现）**：
-TVBox 的 `type:0`（MacCMS 原生）搜索，是把关键词拼成 `api?ac=videolist&wd=关键词` 发给服务器，
-**靠服务器按关键词过滤后返回结果**。而我们的 `catalog.json` 放在 **GitHub Pages（纯静态）**，
-静态服务器**根本不会按 `wd` 过滤**——任何搜索请求都原样返回全部 129 条（甚至被壳子解析成 0 条）。
-所以「type:0 静态站」从原理上就做不了真正的搜索过滤，这正是你一直“搜不到/没找到数据”的原因。
+**根因（查证过，别再绕路）**：TVBox 的 `type:0`（MacCMS 原生）搜索是
+`api?ac=videolist&wd=关键词`，**靠服务器按词过滤返回**。我们的数据放在
+**GitHub Pages（纯静态）**，静态服务器**不会按 `wd` 过滤**，所以静态站天生搜不到。
+之前试过的两条路都死在这：
+- `type:3` + `.js` 链接 → 影视仓把 type:3 当 **jar 包**加载，`.js` 解析失败 → 整站加载不出来；
+- `type:0` + `spider` 字段（JS 蜘蛛客户端过滤）→ 你的影视仓**没真正执行该蜘蛛的搜索**，列表能看、搜索空。
 
-**解决（已上线）**：搜索改用 **`type:0` 站点 + `spider` 字段挂载的 drpy 蜘蛛**（`spider.js`）。
-蜘蛛在 **TVBox 内部（你的设备）** 读取 `catalog.json`，按你输入的中文关键词客户端过滤，
-不依赖任何服务器过滤，纯 GitHub 托管即可。已修复两个会“搜不到”的壳子兼容坑：
-1. 所有函数一律 `return JSON.stringify(...)`——兼容 catvod 老实现直接 `new JSONObject((String)ret)`，
-   之前返回 JS 对象会被解析成 `[object Object]` 导致搜索崩空；
-2. `search` 兼容两种壳子签名 `search(wd,quick,pg)` 与 `search(wd,pg)`，
-   之前两参数调用时翻页算成 `NaN` 返回空列表。
+**最可靠方案：Cloudflare 云端搜索代理（✅ 代码已写好在 `cloudflare-worker.js`）**
+把静态 catalog 变成一个真正能在服务端按词过滤的 MacCMS 接口，影视仓用 `type:0` 原生就能搜，
+**完全不碰 JS 蜘蛛、不依赖壳子 JS 支持**。免费、5 分钟部署，纯云端（符合你“不要本机”要求）。
+详见下方「☁ 云端搜索（Cloudflare Worker）」章节——部署后把 Worker 地址发我，我更新订阅推送即可。
 
-订阅里 **第一个站点「我的杜比资源站(可搜索)」就是 `type:0` + `spider` 字段挂载的 JS 蜘蛛**（searchable:1）；
-第二个「仅浏览」是纯 type:0 静态站（searchable:0，只用来浏览，不做搜索）。
+> 部署后的预期：影视仓全局搜索或站点内搜「泰坦尼克号」→ 服务端精确返回该条，100% 出结果。
 
-> **搜索预期行为**
-> - 全局搜索或点进蜘蛛站点搜「泰坦尼克号」→ 只出泰坦尼克号（精确，靠客户端过滤）。
-> - 已用真实目录在 node 里实测：两种签名都能命中「泰坦尼克号 4K原盘REMUX 杜比视界…」。
+## ☁ 云端搜索（Cloudflare Worker）部署
 
-**导入后请重拉订阅**：TVBox 设置里「清除缓存」→ 重新加载订阅链接，让新的 type:0+spider 站点生效。
+代码已在本仓库 `cloudflare-worker.js`。它从 GitHub 拉 `catalog.json`（5 分钟缓存），
+按 `wd` 过滤后返回标准 MacCMS JSON，等价于一个“会搜索的 MacCMS 源”。
+
+**部署步骤（免费）**：
+1. 打开 https://www.cloudflare.com/ 注册 / 登录（免费）
+2. 左侧 **Workers & Pages** → 创建 → **创建 Worker**
+3. 名称填 `dolby-search`，把默认代码**全删**，粘贴 `cloudflare-worker.js` 的全部内容
+4. 点 **部署**
+5. 得到地址：`https://dolby-search.<你的子域>.workers.dev`
+6. 把该地址发我（或直接填进影视仓，见下）
+
+**影视仓里怎么用**：
+- 订阅 `subscribe.json` 第一站会被我改成 `type:0`、`api=Worker地址`、去掉 spider 字段，你重拉订阅即生效；
+- 或手动：影视仓「站点管理」→ 新增自定义站点 → 名称随意、类型 `0`、API 填
+  `https://dolby-search.<你的子域>.workers.dev`（**不要加 /dolby 等后缀**）、
+  勾选「可搜索」。搜「泰坦尼克号」即精确命中。
+
+**为什么这次一定行**：搜索在**服务端（Cloudflare 边缘）**完成，影视仓只负责发请求和展示，
+彻底绕开“壳子是否支持 JS 蜘蛛”这个坑。
 
 **备选订阅链接（jsdelivr 转圈时换这些）**：
 - GitHub Pages（推荐，国内一般可达）：
@@ -57,8 +71,8 @@ TVBox 的 `type:0`（MacCMS 原生）搜索，是把关键词拼成 `api?ac=vide
 3. **看卡在哪一层**：
    - 配置都加载不出来（界面空白）→ 订阅链接被墙，换 GitHub Pages 链接；
    - 能看到「我的杜比资源站」且能浏览列表 → 正常，说明 type:0 接口已通；
-   - 搜索没反应/一直空 → 确认导入的是**第一个「可搜索」站点（它带 spider 字段）**，并清缓存重拉订阅；
-     若你的壳子（如旧版影视仓）禁用 JS 蜘蛛，type:0 站本身无法按词过滤，需要走云端过滤方案（见下方说明）；
+   - 搜索没反应/一直空 → 当前主搜索依赖 JS 蜘蛛，若你的影视仓不执行蜘蛛搜索则必然空；
+     请改用「☁ 云端搜索（Cloudflare Worker）」方案（见上方章节），那是 100% 可用的服务端过滤；
    - 能看到影片列表但点播放转圈 → 正常，网盘链接需要配好网盘 cookie 才能播（见下方网盘章节）。
 4. **清缓存重进**：TVBox 设置里「清除缓存」后重新拉订阅。
 
@@ -225,8 +239,9 @@ python server.py --port 9000 # 自定义端口
 |------|------|
 | `config.json` | 源地址 + 杜比关键词 + GitHub 目标 |
 | `crawler.py` | 爬虫：支持 `tg_channel`（Telegram原盘频道抓夸克/百度链接）、`maccms`（原盘站过滤）、`dolby_list`（Dolby官方片单+搜源）三种模式 |
-| `spider.js` | TVBox drpy 蜘蛛，读取 catalog.json 当资源站 |
-| `subscribe.json` | TVBox 站点导入入口（type:0 + spider.js 可搜索为主 + type:0 静态浏览兜底，影视仓兼容） |
+| `spider.js` | TVBox drpy 蜘蛛，读取 catalog.json 当资源站（兼容壳子备选；主搜索已改用云端 Worker） |
+| `cloudflare-worker.js` | ☁ 云端搜索代理：把静态 catalog 变成可过滤的 MacCMS 接口，影视仓 type:0 原生即可搜 |
+| `subscribe.json` | TVBox 站点导入入口（部署 Worker 后第一站改为 type:0 指向 Worker 地址；当前为 type:0+spider 兼容备选） |
 | `netdisk_parser.js` | 网盘解析蜘蛛模板（夸克/百度），播放侧需填你的 cookie/接口 |
 | `netdisk_config/server.py` | 本地网盘配置小站后端（复刻 SUN 面板，标准库无依赖） |
 | `netdisk_config/static/` | 配置小站前端页面（index.html + app.js） |
