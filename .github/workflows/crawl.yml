@@ -34,6 +34,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin "https://x-access-token:${TOKEN}@github.com/${REPO}.git"
           git add mybox-self.json jar/sun_spider.jar
+          if [ -f sun_sites_cache.json ]; then git add sun_sites_cache.json; fi
           if git diff --cached --quiet; then
             echo "无变化，跳过提交"
           else
