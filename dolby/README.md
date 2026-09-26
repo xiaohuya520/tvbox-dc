@@ -100,6 +100,27 @@ python push_to_github.py
 > 配好 `netdisk_parser.js`（填你的 cookie 或解析接口）即恢复播放。
 > 注意：cookie/BDUSS 是敏感凭据，**不要在聊天里发给我**，本地填文件或 TVBox ext 即可。
 
+**③ 网盘配置小站（复刻 SUN 面板，推荐用来拿 cookie）**
+不想手动抓 cookie？本仓库自带一个本地 Web 小站 `netdisk_config/`，
+界面和 SUN 的网盘配置面板一致，用来管 cookie / 扫码登录 / 清晰度 / 线程数：
+
+- **清除 Cookie**：一键清掉夸克或百度的登录态。
+- **二维码扫码登录**：点「获取二维码」，用**夸克 App** 或**百度网盘 App** 扫一下，
+  后端自动轮询，确认后把 cookie 存本地（百度端到端拿 BDUSS；夸克到「已确认」后
+  尝试自动提 `ck`，若夸克接口临时调整，用页面里的「手动粘贴 ck」兜底，效果一样）。
+- **网盘清晰度**：原画 / 超清1080P / 高清720P / 标清。
+- **线程数**：16 / 32 / 64（解析/下载并发）。
+
+运行：
+```bash
+cd netdisk_config
+python server.py              # 默认 http://127.0.0.1:8777
+python server.py --port 9000 # 自定义端口
+```
+浏览器打开后选网盘 → 获取二维码 → 扫码 → 点「生成 ext」，把出来的 JSON
+粘到 TVBox 对应网盘站点的 `ext` 里即可。`netdisk_config/settings.json`
+只存本机、**不会上传 GitHub**（推送脚本已排除）。
+
 ## 文件说明
 | 文件 | 作用 |
 |------|------|
@@ -108,6 +129,9 @@ python push_to_github.py
 | `spider.js` | TVBox drpy 蜘蛛，读取 catalog.json 当资源站 |
 | `subscribe.json` | TVBox 站点导入入口（type:3 + spider） |
 | `netdisk_parser.js` | 网盘解析蜘蛛模板（夸克/百度），播放侧需填你的 cookie/接口 |
+| `netdisk_config/server.py` | 本地网盘配置小站后端（复刻 SUN 面板，标准库无依赖） |
+| `netdisk_config/static/` | 配置小站前端页面（index.html + app.js） |
+| `netdisk_config/settings.json` | 本机 cookie/设置，**仅本地，不推送** |
 | `push_to_github.py` | 用 REST API 把 dolby/ 推到 GitHub |
 | `data/catalog.json` | 生成的杜比目录（MacCMS 兼容） |
 
