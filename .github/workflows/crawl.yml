@@ -33,8 +33,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin "https://x-access-token:${TOKEN}@github.com/${REPO}.git"
-          git add mybox-self.json jar/sun_spider.jar
-          for f in sun_sites_cache.json mybox-pure.json source_sites.json; do
+          git add mybox-self.json jar/sun_spider.jar jar/sun_spider.png
+          for f in sun_sites_cache.json mybox-pure.json mybox-self-cdn.json source_sites.json; do
             if [ -f "$f" ]; then git add "$f"; fi
           done
           if git diff --cached --quiet; then
@@ -44,3 +44,13 @@ jobs:
             git pull --rebase --no-edit origin main || true
             git push
           fi
+
+      - name: Purge jsDelivr cache
+        # 手机端走 jsDelivr，提交后立即清缓存，保证拿到最新版（jsDelivr 默认缓存 12h）
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          for f in mybox-self.json mybox-self-cdn.json mybox-pure.json sun_sites_cache.json source_sites.json jar/sun_spider.png; do
+            curl -s --max-time 20 "https://purge.jsdelivr.net/gh/${REPO}@main/$f" > /dev/null || true
+            echo "purged: $f"
+          done
