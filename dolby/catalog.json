@@ -1,5 +1,22 @@
 {
-  "updated": "2026-09-26T12:50:00",
+  "updated": "2026-09-26T13:21:50",
+  "class": [
+    {
+      "type_id": "1",
+      "type_name": "夸克网盘"
+    },
+    {
+      "type_id": "2",
+      "type_name": "百度网盘"
+    },
+    {
+      "type_id": "3",
+      "type_name": "全部"
+    }
+  ],
+  "page": 1,
+  "pagecount": 1,
+  "limit": "35",
   "total": 35,
   "list": [
     {
